@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+/* ===== هوية منصة بيانات الشباب ===== */
+@theme {
+  --color-navy: #1e2a52;        /* الكحلي الأساسي */
+  --color-navy-2: #28376a;      /* بطاقات داكنة */
+  --color-navy-3: #34508f;      /* أزرق متوسط للأزرار الثانوية */
+  --color-gold: #c3a98f;        /* الذهبي/البيج */
+  --color-gold-2: #b2977b;      /* ذهبي أغمق للـ hover */
+  --color-cream: #eef1f8;       /* خلفية فاتحة */
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #eef1f8;
+  background-image: radial-gradient(rgba(30, 42, 82, 0.06) 1px, transparent 1px);
+  background-size: 22px 22px;
+  min-height: 100vh;
+  font-family: var(--font-sans, system-ui, "Segoe UI", Tahoma, sans-serif);
+  color: #1e2a52;
+}
+
+input,
+select,
+textarea,
+button {
+  font-family: inherit;
+}

@@ -1,0 +1,205 @@
+<div id="yd-dash" dir="rtl">
+  <div class="yd-head">
+    <h2>لوحة إحصاءات المستخدمين وتسجيل الدخول</h2>
+    <button id="yd-refresh" type="button">تحديث ⟳</button>
+  </div>
+
+  <div id="yd-loading" class="yd-loading">جارٍ تحميل البيانات…</div>
+  <div id="yd-error" class="yd-error" style="display:none">تعذّر تحميل البيانات.</div>
+
+  <div id="yd-kpis" class="yd-kpis"></div>
+
+  <div class="yd-charts">
+    <div class="yd-card wide"><h3>التسجيلات خلال آخر 30 يوماً</h3><canvas id="c_reg_timeline"></canvas></div>
+    <div class="yd-card wide"><h3>تسجيلات الدخول خلال آخر 30 يوماً</h3><canvas id="c_login_timeline"></canvas></div>
+    <div class="yd-card"><h3>أوقات تسجيل الدخول (حسب الساعة)</h3><canvas id="c_login_hour"></canvas></div>
+    <div class="yd-card"><h3>أوقات التسجيل (حسب الساعة)</h3><canvas id="c_reg_hour"></canvas></div>
+    <div class="yd-card"><h3>تسجيل الدخول حسب يوم الأسبوع</h3><canvas id="c_login_wday"></canvas></div>
+    <div class="yd-card"><h3>حسب نوع المستخدم</h3><canvas id="c_type"></canvas></div>
+    <div class="yd-card"><h3>طريقة التسجيل</h3><canvas id="c_auth"></canvas></div>
+    <div class="yd-card"><h3>حسب الجنس</h3><canvas id="c_gender"></canvas></div>
+    <div class="yd-card"><h3>أعلى المناطق (المدن)</h3><canvas id="c_city"></canvas></div>
+    <div class="yd-card"><h3>أعلى الدول</h3><canvas id="c_country"></canvas></div>
+    <div class="yd-card"><h3>الفئات العمرية</h3><canvas id="c_age"></canvas></div>
+    <div class="yd-card"><h3>حسب الدرجة العلمية</h3><canvas id="c_degree"></canvas></div>
+    <div class="yd-card"><h3>أعلى الجامعات</h3><canvas id="c_university"></canvas></div>
+    <div class="yd-card"><h3>أعلى التخصصات</h3><canvas id="c_specialty"></canvas></div>
+    <div class="yd-card"><h3>أعلى مجالات البحث</h3><canvas id="c_research"></canvas></div>
+    <div class="yd-card"><h3>حسب حالة الحساب</h3><canvas id="c_status"></canvas></div>
+    <div class="yd-card"><h3>أكثر المستخدمين نشاطاً</h3><canvas id="c_top_users"></canvas></div>
+  </div>
+</div>
+
+<style>
+#yd-dash{font-family:'IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif;color:#1e2a52;padding:4px}
+#yd-dash .yd-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+#yd-dash .yd-head h2{font-size:20px;font-weight:800;margin:0}
+#yd-dash #yd-refresh{background:#1e2a52;color:#fff;border:0;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer}
+#yd-dash #yd-refresh:hover{background:#28376a}
+#yd-dash .yd-loading{padding:20px;color:#64748b}
+#yd-dash .yd-error{padding:14px;background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;border-radius:10px}
+#yd-dash .yd-kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:22px}
+#yd-dash .kpi{background:#fff;border:1px solid #e6e9f0;border-radius:14px;padding:14px 16px;box-shadow:0 1px 3px rgba(30,42,82,.06)}
+#yd-dash .kpi .v{font-size:26px;font-weight:800;color:#1e2a52;line-height:1.1}
+#yd-dash .kpi .t{font-size:12.5px;color:#64748b;margin-top:4px}
+#yd-dash .kpi .i{font-size:18px;float:left;opacity:.85}
+#yd-dash .kpi.gold{border-color:#e7d8c7;background:linear-gradient(180deg,#fbf7f2,#fff)}
+#yd-dash .kpi.gold .v{color:#b2977b}
+#yd-dash .yd-charts{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+#yd-dash .yd-card{background:#fff;border:1px solid #e6e9f0;border-radius:14px;padding:14px 16px 8px;box-shadow:0 1px 3px rgba(30,42,82,.06)}
+#yd-dash .yd-card.wide{grid-column:1 / -1}
+#yd-dash .yd-card h3{font-size:14px;font-weight:700;margin:0 0 10px;color:#334155}
+#yd-dash .yd-card canvas{max-height:260px}
+#yd-dash .yd-card.wide canvas{max-height:300px}
+@media(max-width:800px){#yd-dash .yd-charts{grid-template-columns:1fr}}
+</style>
+
+<script>
+(function () {
+  var CANVAS_LIB = "https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js";
+  var COLORS = ["#1e2a52","#c3a98f","#34508f","#5b7bbf","#b2977b","#8aa2d0","#2f855a","#c05621","#6b46c1","#0e7490","#be123c","#a16207"];
+  var charts = {};
+
+  var KPI = [
+    {k:"total_users",       t:"إجمالي المستخدمين", i:"👥", g:1},
+    {k:"today",             t:"تسجيلات اليوم", i:"📅"},
+    {k:"yesterday",         t:"تسجيلات أمس", i:"📆"},
+    {k:"week",              t:"تسجيلات آخر 7 أيام", i:"🗓️"},
+    {k:"month",             t:"تسجيلات هذا الشهر", i:"📈"},
+    {k:"active_accounts",   t:"حسابات نشطة", i:"✅"},
+    {k:"google_users",      t:"مستخدمو Google", i:"🔵", g:1},
+    {k:"local_users",       t:"تسجيل عادي", i:"🔑"},
+    {k:"with_avatar",       t:"لديهم صورة", i:"🖼️"},
+    {k:"with_phone",        t:"لديهم جوال", i:"📱"},
+    {k:"males",             t:"ذكور", i:"👨"},
+    {k:"females",           t:"إناث", i:"👩"},
+    {k:"countries_count",   t:"عدد الدول", i:"🌍"},
+    {k:"cities_count",      t:"عدد المدن", i:"🏙️"},
+    {k:"universities_count",t:"عدد الجامعات", i:"🎓"},
+    {k:"total_sessions",    t:"إجمالي الجلسات", i:"🔗", g:1},
+    {k:"active_sessions",   t:"جلسات نشطة الآن", i:"🟢"},
+    {k:"logins_today",      t:"دخول اليوم", i:"🚪"},
+    {k:"logins_week",       t:"دخول آخر 7 أيام", i:"📥"},
+    {k:"logins_month",      t:"دخول هذا الشهر", i:"📊"},
+    {k:"last_24h_logins",   t:"دخول آخر 24 ساعة", i:"⏱️"},
+    {k:"unique_logins_7d",  t:"مستخدمون فريدون (7 أيام)", i:"🧍"},
+    {k:"unique_logins_30d", t:"مستخدمون فريدون (30 يوم)", i:"🧑‍🤝‍🧑"},
+    {k:"distinct_ips",      t:"عناوين IP مختلفة", i:"📡"}
+  ];
+
+  var WDAYS = ["الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت","الأحد"];
+
+  function loadLib() {
+    return new Promise(function (res, rej) {
+      if (window.Chart) return res();
+      var s = document.createElement("script");
+      s.src = CANVAS_LIB; s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+
+  function toLV(arr){ arr = arr||[]; return {labels:arr.map(function(o){return o.label;}), values:arr.map(function(o){return o.value;})}; }
+  function fmt(n){ return (n==null?0:n).toLocaleString("ar-EG"); }
+
+  function hourSeries(arr){
+    var out = new Array(24).fill(0);
+    (arr||[]).forEach(function(o){ var h=parseInt(o.label,10); if(h>=0&&h<24) out[h]=o.value; });
+    return out;
+  }
+  function wdaySeries(arr){
+    var out = new Array(7).fill(0);
+    (arr||[]).forEach(function(o){ var i=parseInt(o.label,10); if(i>=0&&i<7) out[i]=o.value; });
+    return out;
+  }
+
+  function destroy(id){ if(charts[id]){ charts[id].destroy(); delete charts[id]; } }
+
+  function make(id, type, labels, data, opts){
+    var el = document.getElementById(id); if(!el) return;
+    destroy(id);
+    var isPie = (type==="doughnut"||type==="pie");
+    charts[id] = new Chart(el, {
+      type: type,
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: isPie ? COLORS : (type==="line" ? "rgba(30,42,82,.12)" : COLORS[0]),
+          borderColor: type==="line" ? "#1e2a52" : (isPie ? "#fff" : COLORS[0]),
+          borderWidth: type==="line" ? 2 : (isPie ? 2 : 0),
+          fill: type==="line",
+          tension: .35,
+          borderRadius: type==="bar" ? 6 : 0
+        }]
+      },
+      options: Object.assign({
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{ display:isPie, position:"bottom", labels:{font:{family:"IBM Plex Sans Arabic"},padding:12} } },
+        scales: isPie ? {} : { x:{grid:{display:false},ticks:{font:{family:"IBM Plex Sans Arabic"}}}, y:{beginAtZero:true,ticks:{precision:0}} }
+      }, opts||{})
+    });
+  }
+
+  function render(d){
+    document.getElementById("yd-loading").style.display = "none";
+    var k = d.kpis || {};
+
+    // بطاقات المؤشرات
+    var html = "";
+    KPI.forEach(function(o){
+      html += '<div class="kpi'+(o.g?' gold':'')+'"><span class="i">'+o.i+'</span>'
+            + '<div class="v">'+fmt(k[o.k])+'</div><div class="t">'+o.t+'</div></div>';
+    });
+    document.getElementById("yd-kpis").innerHTML = html;
+
+    // مخططات زمنية
+    var rt = toLV(d.reg_timeline);   make("c_reg_timeline","line", rt.labels, rt.values);
+    var lt = toLV(d.login_timeline); make("c_login_timeline","line", lt.labels, lt.values);
+
+    // ساعات ويوم الأسبوع
+    var hrs = Array.from({length:24},function(_,i){return i+":00";});
+    make("c_login_hour","bar", hrs, hourSeries(d.login_by_hour));
+    make("c_reg_hour","bar", hrs, hourSeries(d.reg_by_hour));
+    make("c_login_wday","bar", WDAYS, wdaySeries(d.login_by_weekday));
+
+    // توزيعات دائرية / أعمدة
+    var t;
+    t=toLV(d.by_type);       make("c_type","doughnut", t.labels, t.values);
+    make("c_auth","doughnut", ["Google","تسجيل عادي"], [k.google_users||0, k.local_users||0]);
+    t=toLV(d.by_gender);     make("c_gender","doughnut", t.labels, t.values);
+    t=toLV(d.by_city);       make("c_city","bar", t.labels, t.values, {indexAxis:"y"});
+    t=toLV(d.by_country);    make("c_country","bar", t.labels, t.values, {indexAxis:"y"});
+    t=toLV(d.age_groups);    make("c_age","bar", t.labels, t.values);
+    t=toLV(d.by_degree);     make("c_degree","doughnut", t.labels, t.values);
+    t=toLV(d.by_university); make("c_university","bar", t.labels, t.values, {indexAxis:"y"});
+    t=toLV(d.by_specialty);  make("c_specialty","bar", t.labels, t.values, {indexAxis:"y"});
+    t=toLV(d.by_research);   make("c_research","bar", t.labels, t.values, {indexAxis:"y"});
+    t=toLV(d.by_status);     make("c_status","doughnut", t.labels, t.values);
+    t=toLV(d.top_users);     make("c_top_users","bar", t.labels, t.values, {indexAxis:"y"});
+  }
+
+  function fetchData(){
+    document.getElementById("yd-error").style.display = "none";
+    document.getElementById("yd-loading").style.display = "block";
+    apex.server.process("GET_DASHBOARD", {}, {
+      dataType: "json",
+      success: function(data){ render(data); },
+      error: function(){ document.getElementById("yd-loading").style.display="none"; document.getElementById("yd-error").style.display="block"; }
+    });
+  }
+
+  function boot(){
+    loadLib().then(function(){
+      document.getElementById("yd-refresh").addEventListener("click", fetchData);
+      fetchData();
+    }).catch(function(){
+      document.getElementById("yd-loading").style.display="none";
+      document.getElementById("yd-error").textContent="تعذّر تحميل مكتبة الرسوم.";
+      document.getElementById("yd-error").style.display="block";
+    });
+  }
+
+  if (window.apex && apex.jQuery) { apex.jQuery(function(){ boot(); }); }
+  else { document.addEventListener("DOMContentLoaded", boot); }
+})();
+</script>
