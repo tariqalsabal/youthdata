@@ -2,11 +2,12 @@
 -- نقاط الاشتراك العامة في ORDS (وحدة account_api)
 --   POST /account/v1/newsletter/subscribe        { "email": "...", "name": "..." }
 --   GET  /account/v1/newsletter/unsubscribe/:token
--- يُشغَّل مرة واحدة في SQL Workshop على قاعدة youthdata.maxapex.net
+-- ملاحظة: نقطة الاشتراك تُرسل ترويسة CORS ( * ) لتعمل من أي موقع.
+-- يُعاد تشغيله بأمان (ORDS.DEFINE_* تحدّث الموجود).
 -- ============================================================
 BEGIN
   ------------------------------------------------------------------
-  -- الاشتراك (عام — للمسجّل وغير المسجّل)
+  -- الاشتراك (عام — للمسجّل وغير المسجّل، ومن أي موقع)
   ------------------------------------------------------------------
   ORDS.DEFINE_TEMPLATE(p_module_name => 'account_api', p_pattern => 'newsletter/subscribe');
   ORDS.DEFINE_HANDLER(
@@ -23,7 +24,11 @@ DECLARE
   l_uid    NUMBER;
   l_token  VARCHAR2(64);
 BEGIN
-  OWA_UTIL.mime_header('application/json', TRUE, 'UTF-8');
+  -- ترويسات الاستجابة مع CORS
+  OWA_UTIL.mime_header('application/json', FALSE, 'UTF-8');
+  HTP.p('Access-Control-Allow-Origin: *');
+  OWA_UTIL.http_header_close;
+
   IF l_email IS NULL OR INSTR(l_email,'@') = 0 THEN
     HTP.p('{"success":false,"error":"البريد الإلكتروني غير صحيح"}'); RETURN;
   END IF;

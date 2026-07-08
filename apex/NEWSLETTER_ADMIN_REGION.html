@@ -30,13 +30,59 @@
 
   <!-- النشرات -->
   <div id="tab-camp" class="nl-pane" style="display:none">
-    <div class="nl-compose">
-      <h3>إنشاء نشرة جديدة</h3>
-      <input id="nl-subject" type="text" placeholder="عنوان النشرة">
-      <textarea id="nl-bodyhtml" rows="8" placeholder="محتوى النشرة (HTML مسموح)"></textarea>
-      <div><button type="button" id="nl-save" class="nl-btn">حفظ كمسودة</button></div>
+    <div class="nl-compose-grid">
+      <!-- نموذج الإنشاء -->
+      <div class="nl-compose">
+        <h3>إنشاء نشرة جديدة</h3>
+
+        <label class="nl-lbl">عنوان الرسالة <span>*</span></label>
+        <input id="nl-subject" type="text" placeholder="مثال: أبرز مستجدات بيانات الشباب لهذا الأسبوع">
+
+        <label class="nl-lbl">نص المعاينة (يظهر في صندوق الوارد)</label>
+        <input id="nl-preheader" type="text" placeholder="ملخص قصير يشجّع على الفتح">
+
+        <label class="nl-lbl">صورة الرأس (رابط اختياري)</label>
+        <input id="nl-image" type="url" placeholder="https://…/banner.jpg">
+
+        <label class="nl-lbl">العنوان الرئيسي داخل الرسالة</label>
+        <input id="nl-title" type="text" placeholder="مرحباً بك 👋">
+
+        <label class="nl-lbl">نص تمهيدي</label>
+        <textarea id="nl-intro" rows="2" placeholder="سطر أو سطران للترحيب"></textarea>
+
+        <label class="nl-lbl">المحتوى (نص عادي أو HTML)</label>
+        <textarea id="nl-bodyhtml" rows="7" placeholder="اكتب محتوى النشرة هنا… الأسطر الجديدة تتحول تلقائياً"></textarea>
+
+        <div class="nl-row2">
+          <div>
+            <label class="nl-lbl">نص زر الإجراء</label>
+            <input id="nl-cta-text" type="text" placeholder="تصفّح المنصة">
+          </div>
+          <div>
+            <label class="nl-lbl">رابط الزر</label>
+            <input id="nl-cta-url" type="url" placeholder="https://youth-data-platform.vercel.app">
+          </div>
+        </div>
+
+        <div class="nl-row2">
+          <div>
+            <label class="nl-lbl">لون التمييز</label>
+            <input id="nl-accent" type="color" value="#c3a98f" class="nl-color">
+          </div>
+          <div style="align-self:end">
+            <button type="button" id="nl-save" class="nl-btn" style="width:100%">حفظ كمسودة</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- المعاينة الحية -->
+      <div class="nl-preview">
+        <div class="nl-preview-head">معاينة مباشرة</div>
+        <iframe id="nl-frame" title="معاينة"></iframe>
+      </div>
     </div>
-    <div class="nl-tablewrap">
+
+    <div class="nl-tablewrap" style="margin-top:16px">
       <table class="nl-table">
         <thead><tr><th>#</th><th>العنوان</th><th>الحالة</th><th>المستهدفون</th><th>أُرسل</th><th>فشل</th><th>أُنشئت</th><th>إجراء</th></tr></thead>
         <tbody id="nl-camps"></tbody>
@@ -58,14 +104,25 @@
 #nl-admin .nl-tab{background:#eef1f8;border:0;border-radius:10px;padding:8px 18px;font-weight:600;cursor:pointer;color:#334155}
 #nl-admin .nl-tab.active{background:#1e2a52;color:#fff}
 #nl-admin .nl-toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-#nl-admin input,#nl-admin select,#nl-admin textarea{border:1px solid #cbd5e1;border-radius:10px;padding:8px 12px;font:inherit;outline:none}
+#nl-admin input,#nl-admin select,#nl-admin textarea{border:1px solid #cbd5e1;border-radius:10px;padding:8px 12px;font:inherit;outline:none;width:100%;box-sizing:border-box}
 #nl-admin input:focus,#nl-admin textarea:focus{border-color:#1e2a52}
 #nl-admin #nl-search{flex:1;min-width:180px}
-#nl-admin .nl-btn{background:#1e2a52;color:#fff;border:0;border-radius:10px;padding:8px 16px;font-weight:600;cursor:pointer}
+#nl-admin .nl-toolbar input,#nl-admin .nl-toolbar select{width:auto}
+#nl-admin .nl-btn{background:#1e2a52;color:#fff;border:0;border-radius:10px;padding:9px 16px;font-weight:600;cursor:pointer}
 #nl-admin .nl-btn:hover{background:#28376a}
 #nl-admin .nl-btn.gold{background:#c3a98f}#nl-admin .nl-btn.gold:hover{background:#b2977b}
 #nl-admin .nl-btn.danger{background:#fee2e2;color:#b91c1c}
 #nl-admin .nl-btn.mini{padding:4px 10px;font-size:12px;margin-inline-start:4px}
+#nl-admin .nl-lbl{display:block;font-size:12.5px;font-weight:600;color:#475569;margin:10px 0 4px}
+#nl-admin .nl-lbl span{color:#dc2626}
+#nl-admin .nl-color{height:40px;padding:4px;cursor:pointer}
+#nl-admin .nl-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#nl-admin .nl-compose-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+#nl-admin .nl-compose{background:#fff;border:1px solid #e6e9f0;border-radius:14px;padding:16px}
+#nl-admin .nl-compose h3{margin:0 0 6px;font-size:15px}
+#nl-admin .nl-preview{background:#fff;border:1px solid #e6e9f0;border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+#nl-admin .nl-preview-head{background:#f8fafc;padding:10px 14px;font-size:13px;font-weight:700;color:#475569;border-bottom:1px solid #eef1f8}
+#nl-admin .nl-preview iframe{width:100%;height:560px;border:0;background:#eef1f8}
 #nl-admin .nl-tablewrap{overflow-x:auto;border:1px solid #e6e9f0;border-radius:12px;background:#fff}
 #nl-admin .nl-table{width:100%;border-collapse:collapse;font-size:13px}
 #nl-admin .nl-table th,#nl-admin .nl-table td{padding:10px 12px;text-align:right;border-bottom:1px solid #f1f5f9;white-space:nowrap}
@@ -73,20 +130,51 @@
 #nl-admin .badge{padding:2px 10px;border-radius:999px;font-size:11px;font-weight:700}
 #nl-admin .badge.active{background:#dcfce7;color:#166534}#nl-admin .badge.unsubscribed{background:#fee2e2;color:#991b1b}
 #nl-admin .badge.draft{background:#e2e8f0;color:#475569}#nl-admin .badge.sent{background:#dbeafe;color:#1e40af}
-#nl-admin .nl-compose{background:#fff;border:1px solid #e6e9f0;border-radius:14px;padding:16px;margin-bottom:16px;display:flex;flex-direction:column;gap:10px}
-#nl-admin .nl-compose h3{margin:0;font-size:15px}
 #nl-admin .nl-toast{position:fixed;bottom:20px;inset-inline-start:20px;background:#1e2a52;color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;opacity:0;transition:.3s;pointer-events:none;z-index:9999}
 #nl-admin .nl-toast.show{opacity:1}
+@media(max-width:900px){#nl-admin .nl-compose-grid{grid-template-columns:1fr}}
 </style>
 
 <script>
 (function(){
   function toast(m){var t=document.getElementById("nl-toast");t.textContent=m;t.classList.add("show");setTimeout(function(){t.classList.remove("show");},2500);}
   function esc(s){return (s==null?"":String(s)).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
-  function p(data){
-    return new Promise(function(res,rej){
-      apex.server.process("NL_ADMIN", data, {dataType:"json", success:res, error:rej});
-    });
+  function val(id){var el=document.getElementById(id);return el?el.value:"";}
+  function p(data){return new Promise(function(res,rej){apex.server.process("NL_ADMIN", data, {dataType:"json", success:res, error:rej});});}
+
+  // ------- بناء قالب البريد من الحقول -------
+  function fields(){
+    return {
+      subject:val("nl-subject").trim(), preheader:val("nl-preheader").trim(),
+      image:val("nl-image").trim(), title:val("nl-title").trim(), intro:val("nl-intro").trim(),
+      body:val("nl-bodyhtml"), ctaText:val("nl-cta-text").trim(), ctaUrl:val("nl-cta-url").trim(),
+      accent:val("nl-accent")||"#c3a98f"
+    };
+  }
+  function buildEmailHtml(f){
+    var navy="#1e2a52", accent=f.accent||"#c3a98f";
+    var body=(f.body||"").trim();
+    if(body && body.indexOf("<")===-1) body=esc(body).replace(/\n/g,"<br>");
+    var pre = f.preheader ? '<div style="display:none;max-height:0;overflow:hidden;opacity:0">'+esc(f.preheader)+'</div>' : '';
+    var banner = f.image ? '<tr><td><img src="'+esc(f.image)+'" alt="" style="display:block;width:100%;max-width:600px;border:0"></td></tr>' : '';
+    var hero = f.title ? '<tr><td style="padding:26px 32px 6px"><h1 style="margin:0;font-size:23px;color:'+navy+'">'+esc(f.title)+'</h1></td></tr>' : '';
+    var intro = f.intro ? '<tr><td style="padding:6px 32px;color:#64748b;font-size:15px;line-height:1.8">'+esc(f.intro)+'</td></tr>' : '';
+    var content = body ? '<tr><td style="padding:12px 32px;color:#334155;font-size:15px;line-height:1.9">'+body+'</td></tr>' : '';
+    var cta = (f.ctaText && f.ctaUrl) ? '<tr><td style="padding:20px 32px 8px"><a href="'+esc(f.ctaUrl)+'" style="display:inline-block;background:'+accent+';color:#1e2a52;text-decoration:none;font-weight:700;padding:12px 30px;border-radius:10px;font-size:15px">'+esc(f.ctaText)+'</a></td></tr>' : '';
+    return ''
+    +'<div dir="rtl" style="background:#eef1f8;padding:24px;font-family:Tahoma,Arial,sans-serif">'+pre
+    +'<table role="presentation" width="600" align="center" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#fff;border-radius:16px;overflow:hidden;border:1px solid #e6e9f0">'
+    +'<tr><td style="background:'+navy+';padding:20px 24px" align="center">'
+    +'<img src="https://youth-data-platform.vercel.app/logo.png" alt="" width="110" style="display:block;margin:0 auto;max-width:110px;height:auto">'
+    +'<div style="color:#fff;font-size:16px;font-weight:700;margin-top:8px">منصة بيانات الشباب</div></td></tr>'
+    +banner+hero+intro+content+cta
+    +'<tr><td style="padding:22px 32px 8px"><div style="height:1px;background:#eef1f8"></div></td></tr>'
+    +'<tr><td style="background:'+navy+';padding:16px 24px;text-align:center;color:'+accent+';font-size:12px">© منصة بيانات الشباب — Youth Data</td></tr>'
+    +'</table></div>';
+  }
+  function updatePreview(){
+    var f=fields(); var el=document.getElementById("nl-frame");
+    el.srcdoc='<!doctype html><html dir="rtl"><head><meta charset="utf-8"></head><body style="margin:0">'+buildEmailHtml(f)+'</body></html>';
   }
 
   function loadStats(){
@@ -101,9 +189,7 @@
   }
 
   function loadSubs(){
-    var q=document.getElementById("nl-search").value;
-    var f=document.getElementById("nl-filter").value;
-    p({x01:"list",x02:q,x03:f}).then(function(d){
+    p({x01:"list",x02:val("nl-search"),x03:val("nl-filter")}).then(function(d){
       var rows=(d.rows||[]).map(function(r){
         var act = r.status==="active"
           ? '<button type="button" class="nl-btn mini danger" data-a="unsub" data-id="'+r.id+'">إلغاء</button>'
@@ -120,8 +206,7 @@
   function loadCamps(){
     p({x01:"campaigns"}).then(function(d){
       var rows=(d.rows||[]).map(function(r){
-        var send = r.status==="draft"
-          ? '<button type="button" class="nl-btn mini gold" data-a="send" data-id="'+r.id+'">إرسال</button>' : '—';
+        var send = r.status==="draft" ? '<button type="button" class="nl-btn mini gold" data-a="send" data-id="'+r.id+'">إرسال</button>' : '—';
         return '<tr><td>'+r.id+'</td><td>'+esc(r.subject)+'</td>'
           +'<td><span class="badge '+r.status+'">'+(r.status==="sent"?"مُرسلة":"مسودة")+'</span></td>'
           +'<td>'+r.recipients+'</td><td>'+r.sent+'</td><td>'+r.fail+'</td><td>'+esc(r.created)+'</td><td>'+send+'</td></tr>';
@@ -131,32 +216,29 @@
   }
 
   function boot(){
-    // منع Enter داخل الحقول من إرسال نموذج الصفحة (إعادة التحميل)
     document.getElementById("nl-admin").addEventListener("keydown", function(e){
       if(e.key==="Enter" && e.target.tagName==="INPUT"){ e.preventDefault(); }
     });
 
-    // تبويبات
     document.querySelectorAll("#nl-admin .nl-tab").forEach(function(b){
       b.addEventListener("click",function(){
         document.querySelectorAll("#nl-admin .nl-tab").forEach(function(x){x.classList.remove("active");});
         b.classList.add("active");
         document.getElementById("tab-subs").style.display = b.dataset.tab==="subs"?"":"none";
         document.getElementById("tab-camp").style.display = b.dataset.tab==="camp"?"":"none";
-        if(b.dataset.tab==="camp") loadCamps();
+        if(b.dataset.tab==="camp"){ loadCamps(); updatePreview(); }
       });
     });
 
     document.getElementById("nl-search").addEventListener("input", function(){clearTimeout(window._nlt);window._nlt=setTimeout(loadSubs,400);});
     document.getElementById("nl-filter").addEventListener("change", loadSubs);
+    document.querySelector("#tab-camp .nl-compose").addEventListener("input", function(){clearTimeout(window._nlp);window._nlp=setTimeout(updatePreview,250);});
 
     document.getElementById("nl-add").addEventListener("click", function(){
-      var em=document.getElementById("nl-newemail").value;
-      if(!em){return;}
+      var em=val("nl-newemail"); if(!em) return;
       p({x01:"add",x02:em}).then(function(r){ if(r.success){document.getElementById("nl-newemail").value="";toast("تمت الإضافة");loadSubs();loadStats();}else{toast(r.error||"خطأ");} });
     });
 
-    // إجراءات جدول المشتركين (تفويض)
     document.getElementById("nl-subs").addEventListener("click", function(e){
       var b=e.target.closest("button"); if(!b) return;
       var id=b.dataset.id, a=b.dataset.a;
@@ -166,11 +248,10 @@
     });
 
     document.getElementById("nl-save").addEventListener("click", function(){
-      var s=document.getElementById("nl-subject").value.trim();
-      var b=document.getElementById("nl-bodyhtml").value;
-      if(!s){toast("أدخل عنواناً");return;}
-      p({x01:"savecampaign",x03:s,p_clob_01:b}).then(function(r){
-        if(r.success){document.getElementById("nl-subject").value="";document.getElementById("nl-bodyhtml").value="";toast("تم حفظ المسودة");loadCamps();loadStats();}
+      var f=fields();
+      if(!f.subject){toast("أدخل عنوان الرسالة");return;}
+      p({x01:"savecampaign",x03:f.subject,p_clob_01:buildEmailHtml(f)}).then(function(r){
+        if(r.success){toast("تم حفظ المسودة");loadCamps();loadStats();}
       });
     });
 
