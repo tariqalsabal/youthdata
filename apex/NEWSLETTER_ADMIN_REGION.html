@@ -4,8 +4,8 @@
   <div id="nl-kpis" class="nl-kpis"></div>
 
   <div class="nl-tabs">
-    <button class="nl-tab active" data-tab="subs">المشتركون</button>
-    <button class="nl-tab" data-tab="camp">النشرات والإرسال</button>
+    <button type="button" class="nl-tab active" data-tab="subs">المشتركون</button>
+    <button type="button" class="nl-tab" data-tab="camp">النشرات والإرسال</button>
   </div>
 
   <!-- المشتركون -->
@@ -18,7 +18,7 @@
         <option value="unsubscribed">ملغى</option>
       </select>
       <input id="nl-newemail" type="email" placeholder="إضافة بريد…">
-      <button id="nl-add" class="nl-btn">إضافة</button>
+      <button type="button" id="nl-add" class="nl-btn">إضافة</button>
     </div>
     <div class="nl-tablewrap">
       <table class="nl-table">
@@ -34,7 +34,7 @@
       <h3>إنشاء نشرة جديدة</h3>
       <input id="nl-subject" type="text" placeholder="عنوان النشرة">
       <textarea id="nl-bodyhtml" rows="8" placeholder="محتوى النشرة (HTML مسموح)"></textarea>
-      <div><button id="nl-save" class="nl-btn">حفظ كمسودة</button></div>
+      <div><button type="button" id="nl-save" class="nl-btn">حفظ كمسودة</button></div>
     </div>
     <div class="nl-tablewrap">
       <table class="nl-table">
@@ -106,9 +106,9 @@
     p({x01:"list",x02:q,x03:f}).then(function(d){
       var rows=(d.rows||[]).map(function(r){
         var act = r.status==="active"
-          ? '<button class="nl-btn mini danger" data-a="unsub" data-id="'+r.id+'">إلغاء</button>'
-          : '<button class="nl-btn mini" data-a="act" data-id="'+r.id+'">تفعيل</button>';
-        act += '<button class="nl-btn mini danger" data-a="del" data-id="'+r.id+'">حذف</button>';
+          ? '<button type="button" class="nl-btn mini danger" data-a="unsub" data-id="'+r.id+'">إلغاء</button>'
+          : '<button type="button" class="nl-btn mini" data-a="act" data-id="'+r.id+'">تفعيل</button>';
+        act += '<button type="button" class="nl-btn mini danger" data-a="del" data-id="'+r.id+'">حذف</button>';
         return '<tr><td>'+r.id+'</td><td>'+esc(r.email)+'</td><td>'+esc(r.name||"—")+'</td>'
           +'<td><span class="badge '+r.status+'">'+(r.status==="active"?"نشط":"ملغى")+'</span></td>'
           +'<td>'+esc(r.source)+'</td><td>'+(r.registered?"✓":"—")+'</td><td>'+esc(r.at)+'</td><td>'+act+'</td></tr>';
@@ -121,7 +121,7 @@
     p({x01:"campaigns"}).then(function(d){
       var rows=(d.rows||[]).map(function(r){
         var send = r.status==="draft"
-          ? '<button class="nl-btn mini gold" data-a="send" data-id="'+r.id+'">إرسال</button>' : '—';
+          ? '<button type="button" class="nl-btn mini gold" data-a="send" data-id="'+r.id+'">إرسال</button>' : '—';
         return '<tr><td>'+r.id+'</td><td>'+esc(r.subject)+'</td>'
           +'<td><span class="badge '+r.status+'">'+(r.status==="sent"?"مُرسلة":"مسودة")+'</span></td>'
           +'<td>'+r.recipients+'</td><td>'+r.sent+'</td><td>'+r.fail+'</td><td>'+esc(r.created)+'</td><td>'+send+'</td></tr>';
@@ -131,6 +131,11 @@
   }
 
   function boot(){
+    // منع Enter داخل الحقول من إرسال نموذج الصفحة (إعادة التحميل)
+    document.getElementById("nl-admin").addEventListener("keydown", function(e){
+      if(e.key==="Enter" && e.target.tagName==="INPUT"){ e.preventDefault(); }
+    });
+
     // تبويبات
     document.querySelectorAll("#nl-admin .nl-tab").forEach(function(b){
       b.addEventListener("click",function(){
