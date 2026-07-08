@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BrandMark, LogoImage } from "@/components/ui";
+import { NewsletterForm } from "@/components/NewsletterForm";
 
 export default function HomePage() {
   return (
@@ -29,6 +30,10 @@ export default function HomePage() {
           >
             تسجيل الدخول
           </Link>
+        </div>
+
+        <div className="mt-12">
+          <NewsletterForm />
         </div>
       </div>
     </main>
