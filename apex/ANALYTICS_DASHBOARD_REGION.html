@@ -1,0 +1,156 @@
+<div id="an-dash" dir="rtl">
+  <div class="an-head">
+    <h2>تحليلات الزيارات والبحث</h2>
+    <button type="button" id="an-refresh">تحديث ⟳</button>
+  </div>
+
+  <div id="an-loading" class="an-loading">جارٍ تحميل البيانات…</div>
+  <div id="an-error" class="an-error" style="display:none">تعذّر تحميل البيانات.</div>
+
+  <div id="an-kpis" class="an-kpis"></div>
+
+  <div class="an-charts">
+    <div class="an-card wide"><h3>الزيارات خلال آخر 30 يوماً</h3><canvas id="c_visits"></canvas></div>
+    <div class="an-card"><h3>أكثر الصفحات زيارة</h3><canvas id="c_pages"></canvas></div>
+    <div class="an-card"><h3>أكثر الأقسام زيارة</h3><canvas id="c_sections"></canvas></div>
+    <div class="an-card"><h3>🔎 أكثر الكلمات بحثاً</h3><canvas id="c_terms"></canvas></div>
+    <div class="an-card"><h3>⚠️ كلمات بحث بلا نتائج (فرص محتوى)</h3><canvas id="c_zero"></canvas></div>
+    <div class="an-card"><h3>مناطق السعودية</h3><canvas id="c_regions"></canvas></div>
+    <div class="an-card"><h3>أعلى المدن السعودية</h3><canvas id="c_cities"></canvas></div>
+    <div class="an-card"><h3>الدول</h3><canvas id="c_countries"></canvas></div>
+    <div class="an-card"><h3>مسجّل مقابل زائر</h3><canvas id="c_reg"></canvas></div>
+    <div class="an-card"><h3>الزيارات حسب الساعة</h3><canvas id="c_hour"></canvas></div>
+    <div class="an-card"><h3>الزيارات حسب يوم الأسبوع</h3><canvas id="c_wday"></canvas></div>
+    <div class="an-card"><h3>نوع الجهاز</h3><canvas id="c_device"></canvas></div>
+    <div class="an-card"><h3>المتصفح</h3><canvas id="c_browser"></canvas></div>
+    <div class="an-card"><h3>نظام التشغيل</h3><canvas id="c_os"></canvas></div>
+    <div class="an-card wide"><h3>عمليات البحث خلال آخر 30 يوماً</h3><canvas id="c_searches"></canvas></div>
+  </div>
+</div>
+
+<style>
+#an-dash{font-family:'IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif;color:#1e2a52;padding:4px}
+#an-dash .an-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+#an-dash .an-head h2{font-size:20px;font-weight:800;margin:0}
+#an-dash #an-refresh{background:#1e2a52;color:#fff;border:0;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer}
+#an-dash #an-refresh:hover{background:#28376a}
+#an-dash .an-loading{padding:20px;color:#64748b}
+#an-dash .an-error{padding:14px;background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;border-radius:10px}
+#an-dash .an-kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:22px}
+#an-dash .kpi{background:#fff;border:1px solid #e6e9f0;border-radius:14px;padding:14px 16px;box-shadow:0 1px 3px rgba(30,42,82,.06)}
+#an-dash .kpi .v{font-size:24px;font-weight:800;color:#1e2a52;line-height:1.1}
+#an-dash .kpi .t{font-size:12.5px;color:#64748b;margin-top:4px}
+#an-dash .kpi .i{font-size:17px;float:left;opacity:.85}
+#an-dash .kpi.gold{border-color:#e7d8c7;background:linear-gradient(180deg,#fbf7f2,#fff)}
+#an-dash .kpi.gold .v{color:#b2977b}
+#an-dash .an-charts{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+#an-dash .an-card{background:#fff;border:1px solid #e6e9f0;border-radius:14px;padding:14px 16px 8px;box-shadow:0 1px 3px rgba(30,42,82,.06)}
+#an-dash .an-card.wide{grid-column:1 / -1}
+#an-dash .an-card h3{font-size:14px;font-weight:700;margin:0 0 10px;color:#334155}
+#an-dash .an-card canvas{max-height:280px}
+#an-dash .an-card.wide canvas{max-height:300px}
+@media(max-width:900px){#an-dash .an-charts{grid-template-columns:1fr}}
+</style>
+
+<script>
+(function () {
+  var LIB = "https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js";
+  var COLORS = ["#1e2a52","#c3a98f","#34508f","#5b7bbf","#b2977b","#8aa2d0","#2f855a","#c05621","#6b46c1","#0e7490","#be123c","#a16207"];
+  var charts = {};
+  var WDAYS = ["الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت","الأحد"];
+
+  var KPI = [
+    {k:"total_visits",    t:"إجمالي الزيارات", i:"👁️", g:1},
+    {k:"today",           t:"زيارات اليوم", i:"📅"},
+    {k:"yesterday",       t:"زيارات أمس", i:"📆"},
+    {k:"week",            t:"آخر 7 أيام", i:"🗓️"},
+    {k:"month",           t:"هذا الشهر", i:"📈"},
+    {k:"unique_visitors", t:"زوّار فريدون", i:"🧍", g:1},
+    {k:"unique_today",    t:"زوّار فريدون اليوم", i:"🧑"},
+    {k:"sessions",        t:"عدد الجلسات", i:"🔗"},
+    {k:"registered",      t:"زيارات مسجّلين", i:"✅"},
+    {k:"guests",          t:"زيارات زوّار", i:"👤"},
+    {k:"countries",       t:"عدد الدول", i:"🌍"},
+    {k:"sa_regions",      t:"مناطق سعودية", i:"🇸🇦"},
+    {k:"searches",        t:"عمليات البحث", i:"🔎", g:1},
+    {k:"unique_terms",    t:"كلمات فريدة", i:"🔤"},
+    {k:"zero_results",    t:"بحث بلا نتائج", i:"⚠️"},
+    {k:"searches_today",  t:"بحث اليوم", i:"🔍"}
+  ];
+
+  function loadLib(){return new Promise(function(res,rej){if(window.Chart)return res();var s=document.createElement("script");s.src=LIB;s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
+  function toLV(a){a=a||[];return{labels:a.map(function(o){return o.label;}),values:a.map(function(o){return o.value;})};}
+  function fmt(n){return (n==null?0:n).toLocaleString("en-US");}
+  function hourSeries(a){var o=new Array(24).fill(0);(a||[]).forEach(function(x){var h=parseInt(x.label,10);if(h>=0&&h<24)o[h]=x.value;});return o;}
+  function wdaySeries(a){var o=new Array(7).fill(0);(a||[]).forEach(function(x){var i=parseInt(x.label,10);if(i>=0&&i<7)o[i]=x.value;});return o;}
+
+  function make(id,type,labels,data,opts){
+    var el=document.getElementById(id); if(!el) return;
+    if(charts[id]){charts[id].destroy();delete charts[id];}
+    var isPie=(type==="doughnut"||type==="pie");
+    charts[id]=new Chart(el,{
+      type:type,
+      data:{labels:labels,datasets:[{data:data,
+        backgroundColor:isPie?COLORS:(type==="line"?"rgba(30,42,82,.12)":COLORS[0]),
+        borderColor:type==="line"?"#1e2a52":(isPie?"#fff":COLORS[0]),
+        borderWidth:type==="line"?2:(isPie?2:0),
+        fill:type==="line",tension:.35,borderRadius:type==="bar"?6:0}]},
+      options:Object.assign({
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:isPie,position:"bottom",labels:{font:{family:"IBM Plex Sans Arabic"},padding:10}}},
+        scales:isPie?{}:{x:{grid:{display:false},ticks:{font:{family:"IBM Plex Sans Arabic"},autoSkip:true}},y:{beginAtZero:true,ticks:{precision:0}}}
+      },opts||{})
+    });
+  }
+
+  function render(d){
+    document.getElementById("an-loading").style.display="none";
+    var k=d.kpis||{};
+    document.getElementById("an-kpis").innerHTML = KPI.map(function(o){
+      return '<div class="kpi'+(o.g?' gold':'')+'"><span class="i">'+o.i+'</span>'
+           + '<div class="v">'+fmt(k[o.k])+'</div><div class="t">'+o.t+'</div></div>';
+    }).join("");
+
+    var t;
+    t=toLV(d.visits_timeline);  make("c_visits","line",t.labels,t.values);
+    t=toLV(d.search_timeline);  make("c_searches","line",t.labels,t.values);
+    t=toLV(d.top_pages);        make("c_pages","bar",t.labels,t.values,{indexAxis:"y"});
+    t=toLV(d.top_sections);     make("c_sections","bar",t.labels,t.values,{indexAxis:"y"});
+    t=toLV(d.top_terms);        make("c_terms","bar",t.labels,t.values,{indexAxis:"y"});
+    t=toLV(d.zero_terms);       make("c_zero","bar",t.labels,t.values,{indexAxis:"y"});
+    t=toLV(d.sa_regions);       make("c_regions","bar",t.labels,t.values);
+    t=toLV(d.sa_cities);        make("c_cities","bar",t.labels,t.values,{indexAxis:"y"});
+    t=toLV(d.by_country);       make("c_countries","bar",t.labels,t.values,{indexAxis:"y"});
+    t=toLV(d.by_device);        make("c_device","doughnut",t.labels,t.values);
+    t=toLV(d.by_browser);       make("c_browser","doughnut",t.labels,t.values);
+    t=toLV(d.by_os);            make("c_os","doughnut",t.labels,t.values);
+    make("c_reg","doughnut",["مسجّلون","زوّار"],[k.registered||0,k.guests||0]);
+    make("c_hour","bar",Array.from({length:24},function(_,i){return i+":00";}),hourSeries(d.by_hour));
+    make("c_wday","bar",WDAYS,wdaySeries(d.by_weekday));
+  }
+
+  function fetchData(){
+    document.getElementById("an-error").style.display="none";
+    document.getElementById("an-loading").style.display="block";
+    apex.server.process("GET_ANALYTICS",{},{
+      dataType:"json",
+      success:function(d){render(d);},
+      error:function(){document.getElementById("an-loading").style.display="none";document.getElementById("an-error").style.display="block";}
+    });
+  }
+
+  function boot(){
+    loadLib().then(function(){
+      document.getElementById("an-refresh").addEventListener("click",fetchData);
+      fetchData();
+    }).catch(function(){
+      document.getElementById("an-loading").style.display="none";
+      document.getElementById("an-error").textContent="تعذّر تحميل مكتبة الرسوم.";
+      document.getElementById("an-error").style.display="block";
+    });
+  }
+
+  if(window.apex&&apex.jQuery){apex.jQuery(function(){boot();});}
+  else{document.addEventListener("DOMContentLoaded",boot);}
+})();
+</script>
