@@ -1,0 +1,262 @@
+<div id="yd-specs" dir="rtl">
+
+  <header class="ys-head">
+    <p class="ys-eyebrow">وثيقة مواصفات فنية</p>
+    <h1>المواصفات الفنية لمنصة بيانات الشباب ولوحات التحكم</h1>
+    <p class="ys-sub">توصيف تفصيلي للبنية التقنية والخوادم والخدمات وقواعد البيانات وواجهات البرمجة ولوحات التحليلات وإجراءات الأمان.</p>
+    <div class="ys-meta">
+      <span>النطاق: <b class="ys-m">youthdata.sa</b></span>
+      <span>نوع النظام: <b>تطبيق ويب متجاوب</b></span>
+      <span>الحالة: <b>يعمل على الإنتاج</b></span>
+      <span>إصدار الوثيقة: <b class="ys-m">1.0</b></span>
+    </div>
+  </header>
+
+  <div class="ys-figs">
+    <div class="ys-fig"><div class="n">18</div><div class="l">صفحة عامة</div></div>
+    <div class="ys-fig"><div class="n">85</div><div class="l">مكوّن واجهة</div></div>
+    <div class="ys-fig"><div class="n">20</div><div class="l">نقطة خدمة API</div></div>
+    <div class="ys-fig"><div class="n">14</div><div class="l">قاعدة بيانات معرفية</div></div>
+    <div class="ys-fig"><div class="n">3</div><div class="l">لوحات تحكم</div></div>
+    <div class="ys-fig"><div class="n">49</div><div class="l">مؤشراً تحليلياً</div></div>
+    <div class="ys-fig"><div class="n">32</div><div class="l">مخططاً بيانياً</div></div>
+    <div class="ys-fig"><div class="n">13</div><div class="l">منطقة سعودية مرصودة</div></div>
+  </div>
+
+  <section><div class="ys-sh"><span class="ys-n">01</span><h2>نظرة عامة</h2></div>
+  <div class="ys-tw"><table>
+    <thead><tr><th style="width:26%">البند</th><th>التفصيل</th></tr></thead><tbody>
+    <tr><td>اسم المنصة</td><td>منصة بيانات الشباب — Youth Data</td></tr>
+    <tr><td>وصف النظام</td><td>منصة رقمية لجمع وعرض البيانات والإحصاءات والمراجع المتعلقة بالشباب السعودي، مع محرك بحث موحّد ولوحات تحليلية إدارية</td></tr>
+    <tr><td>النطاق الرسمي</td><td class="ys-m">https://youthdata.sa</td></tr>
+    <tr><td>لغة الواجهة</td><td>العربية — تخطيط من اليمين إلى اليسار (RTL) بالكامل</td></tr>
+    <tr><td>الفئات المستهدفة</td><td>الباحثون والخبراء · صنّاع القرار · المؤسسات الشبابية · المهتمون بالشأن الشبابي</td></tr>
+    <tr><td>حالة التشغيل</td><td><span class="ys-p ok">يعمل على الإنتاج</span></td></tr>
+    </tbody></table></div></section>
+
+  <section><div class="ys-sh"><span class="ys-n">02</span><h2>البنية المعمارية</h2></div>
+  <p class="ys-note">بنية متعدّدة الطبقات تفصل العرض عن الخدمات عن البيانات، بحيث لا يتصل متصفّح الزائر بقاعدة البيانات مباشرةً في أي حال.</p>
+  <div class="ys-tw"><table>
+    <thead><tr><th style="width:15%">الطبقة</th><th style="width:30%">التقنية</th><th>الدور</th></tr></thead><tbody>
+    <tr><td>العرض</td><td>Next.js 16 / React 19 — على Vercel</td><td>الصفحات العامة وواجهة المستخدم والمخططات التفاعلية</td></tr>
+    <tr><td>الوساطة</td><td>Next.js API Routes (بروكسي خادمي)</td><td>تمرير الطلبات بأمان، إثراء البيانات جغرافياً، إخفاء عنوان خادم البيانات</td></tr>
+    <tr><td>الخدمات</td><td>Oracle REST Data Services (ORDS)</td><td>نقاط الأعمال: الحسابات والمحتوى والتتبّع والنشرة البريدية</td></tr>
+    <tr><td>البيانات</td><td>Oracle Database — سكيمة <span class="ys-m">DATA_CENTER</span></td><td>التخزين والمنطق التطبيقي بلغة PL/SQL</td></tr>
+    <tr><td>الإدارة</td><td>Oracle APEX 24.2</td><td>لوحات التحكم والتحليلات وإدخال البيانات للمشرفين</td></tr>
+    </tbody></table></div></section>
+
+  <section><div class="ys-sh"><span class="ys-n">03</span><h2>الخوادم والخدمات التشغيلية</h2></div>
+  <p class="ys-note">تعمل المنصة على بنية موزّعة: طبقة العرض على شبكة حافة عالمية، وطبقة البيانات على خادم Oracle مخصّص.</p>
+  <div class="ys-tw"><table>
+    <thead><tr><th style="width:22%">الخدمة</th><th style="width:24%">التقنية / المزوّد</th><th>التفصيل التشغيلي</th></tr></thead><tbody>
+    <tr><td>خادم الواجهة</td><td>Vercel — بنية بلا خوادم (Serverless)</td><td>تشغيل تلقائي التوسّع دون إدارة خوادم؛ يتحمّل ذروة الزيارات دون تدخّل</td></tr>
+    <tr><td>دوال الخادم</td><td>Serverless Functions (Node.js)</td><td>تنفيذ مسارات API عند الطلب فقط — سبع دوال تشمل البروكسي والتتبّع وبيانات المخططات</td></tr>
+    <tr><td>شبكة التوصيل</td><td>Vercel Edge Network (CDN)</td><td>خوادم حافة موزّعة عالمياً تخزّن المحتوى الثابت وتخدمه من أقرب نقطة للزائر</td></tr>
+    <tr><td>خادم قاعدة البيانات</td><td>Oracle Database (بنية PDB)</td><td>قاعدة بيانات قابلة للتوصيل، ترميز عالمي يدعم العربية بالكامل</td></tr>
+    <tr><td>طبقة الخدمات REST</td><td>Oracle REST Data Services (ORDS)</td><td>وسيط Java يحوّل إجراءات PL/SQL إلى نقاط REST/JSON آمنة</td></tr>
+    <tr><td>بيئة الإدارة</td><td>Oracle APEX 24.2</td><td>تطبيق «مركز بيانات الشباب» — إدخال البيانات ولوحات التحليلات وإدارة الصلاحيات</td></tr>
+    <tr><td>خدمة البريد</td><td>Microsoft 365 · Graph API</td><td>إرسال النشرة البريدية من العنوان الرسمي عبر مصادقة تطبيقية آمنة</td></tr>
+    <tr><td>خدمة DNS</td><td>Cloudflare</td><td>إدارة سجلات النطاق وتوجيه الحركة</td></tr>
+    <tr><td>شهادات التشفير</td><td>Let's Encrypt</td><td>إصدار وتجديد تلقائي دون انقطاع</td></tr>
+    <tr><td>مستودع الكود</td><td>GitHub — مستودع خاص</td><td>سجل كامل للتغييرات مع إمكانية التراجع لأي إصدار سابق</td></tr>
+    <tr><td>خط النشر</td><td>نشر مستمر (CI/CD)</td><td>بناء ونشر تلقائي عند كل تحديث، مع رابط معاينة منفصل قبل الإنتاج</td></tr>
+    </tbody></table></div>
+  <div class="ys-tw" style="margin-top:14px"><table>
+    <thead><tr><th style="width:26%">المواصفة التقنية</th><th>القيمة</th></tr></thead><tbody>
+    <tr><td>بروتوكول النقل</td><td>HTTPS عبر المنفذ 443 — تشفير TLS على جميع الطبقات</td></tr>
+    <tr><td>صيغة تبادل البيانات</td><td>JSON بترميز UTF-8</td></tr>
+    <tr><td>ترميز قاعدة البيانات</td><td>ترميز عالمي (Unicode) يدعم النصوص العربية وأسماء الأعمدة العربية</td></tr>
+    <tr><td>نمط الاتصال</td><td>REST عديم الحالة (Stateless) مع توثيق برمز جلسة</td></tr>
+    <tr><td>التوسّع</td><td>تلقائي في طبقة العرض؛ طبقة البيانات على خادم مخصّص</td></tr>
+    <tr><td>التراجع عن النشر</td><td>كل نشرة محفوظة ويمكن العودة إليها فوراً</td></tr>
+    </tbody></table></div></section>
+
+  <section><div class="ys-sh"><span class="ys-n">04</span><h2>الواجهة الأمامية</h2></div>
+  <div class="ys-tw"><table>
+    <thead><tr><th style="width:26%">المكوّن</th><th style="width:14%">الإصدار</th><th>الوظيفة</th></tr></thead><tbody>
+    <tr><td>Next.js</td><td class="ys-m">16.1</td><td>إطار العمل الأساسي — توليد من الخادم وتوجيه الصفحات</td></tr>
+    <tr><td>React</td><td class="ys-m">19.1</td><td>مكتبة بناء واجهات المستخدم</td></tr>
+    <tr><td>TypeScript</td><td class="ys-m">5.8</td><td>لغة مُحكمة الأنواع تقلّل الأخطاء البرمجية</td></tr>
+    <tr><td>Tailwind CSS</td><td class="ys-m">4.0</td><td>نظام التنسيق والتصميم المتجاوب</td></tr>
+    <tr><td>Zustand</td><td class="ys-m">5.0</td><td>إدارة حالة التطبيق وجلسة المستخدم</td></tr>
+    <tr><td>ECharts</td><td class="ys-m">6.0</td><td>المخططات التفاعلية والرسوم الشبكية</td></tr>
+    <tr><td>Highcharts + Maps</td><td class="ys-m">12.5</td><td>الخرائط الجغرافية وخرائط مناطق المملكة</td></tr>
+    <tr><td>TanStack Table</td><td class="ys-m">8.21</td><td>جداول متقدمة: فرز وتصفية وترقيم صفحات</td></tr>
+    <tr><td>Radix UI + shadcn</td><td class="ys-m">1.4</td><td>عناصر واجهة متوافقة مع معايير الوصولية</td></tr>
+    <tr><td>Framer Motion</td><td class="ys-m">12.29</td><td>الحركات والانتقالات البصرية</td></tr>
+    <tr><td>SheetJS</td><td class="ys-m">0.18</td><td>تصدير البيانات إلى ملفات Excel</td></tr>
+    <tr><td>IBM Plex Sans Arabic</td><td class="ys-m">—</td><td>الخط الرسمي المعتمد للمنصة</td></tr>
+    </tbody></table></div></section>
+
+  <section><div class="ys-sh"><span class="ys-n">05</span><h2>هيكل قاعدة البيانات</h2></div>
+  <div class="ys-tw"><table>
+    <thead><tr><th style="width:22%">المجموعة</th><th class="c" style="width:10%">العدد</th><th>المحتوى</th></tr></thead><tbody>
+    <tr><td>الحسابات والجلسات</td><td class="ys-num">3</td><td>المستخدمون · جلسات الدخول والرموز · طلبات استعادة كلمة المرور</td></tr>
+    <tr><td>قواعد البيانات المعرفية</td><td class="ys-num">14</td><td>السكان والصحة والتعليم والعمل · الكتب والرسائل الجامعية والمقالات والتقارير والمؤشرات · الخبراء والمراكز البحثية والجهات العاملة مع الشباب · البرامج الأكاديمية والجوائز والمؤتمرات والمبادرات والقوانين</td></tr>
+    <tr><td>القوائم المرجعية</td><td class="ys-num">18+</td><td>المناطق والمدن والجنسيات والتخصصات وجهات العمل والكلمات المفتاحية والتصنيفات</td></tr>
+    <tr><td>إدارة المحتوى</td><td class="ys-num">4</td><td>الصفحات · الأقسام · عناصر الأقسام · ربط الأقسام بالصفحات</td></tr>
+    <tr><td>التحليلات</td><td class="ys-num">3</td><td>سجل الزيارات · سجل عمليات البحث · مرجع مناطق المملكة</td></tr>
+    <tr><td>النشرة البريدية</td><td class="ys-num">4</td><td>المشتركون · النشرات · سجل الإرسال · إعدادات الاتصال</td></tr>
+    </tbody></table></div></section>
+
+  <section><div class="ys-sh"><span class="ys-n">06</span><h2>واجهات البرمجة (API)</h2></div>
+  <p class="ys-note">عشرون نقطة خدمة موزّعة على أربع وحدات. عمود «التوثيق» يوضّح ما إذا كانت النقطة تتطلّب رمز جلسة.</p>
+  <div class="ys-tw"><table>
+    <thead><tr><th style="width:11%">الوحدة</th><th style="width:9%">الطريقة</th><th style="width:27%">المسار</th><th>الوظيفة</th><th class="c" style="width:10%">التوثيق</th></tr></thead><tbody>
+    <tr><td rowspan="10">الحسابات</td><td class="ys-m">POST</td><td class="ys-m">/register</td><td>إنشاء حساب جديد</td><td class="c">عام</td></tr>
+    <tr><td class="ys-m">POST</td><td class="ys-m">/login</td><td>الدخول بالبريد أو اسم المستخدم أو الجوال</td><td class="c">عام</td></tr>
+    <tr><td class="ys-m">POST</td><td class="ys-m">/google</td><td>الدخول أو إنشاء الحساب عبر Google</td><td class="c">عام</td></tr>
+    <tr><td class="ys-m">POST</td><td class="ys-m">/logout</td><td>إنهاء الجلسة</td><td class="c">مطلوب</td></tr>
+    <tr><td class="ys-m">GET</td><td class="ys-m">/me</td><td>بيانات المستخدم الحالي</td><td class="c">مطلوب</td></tr>
+    <tr><td class="ys-m">PUT</td><td class="ys-m">/profile</td><td>تعديل الملف الشخصي</td><td class="c">مطلوب</td></tr>
+    <tr><td class="ys-m">PUT</td><td class="ys-m">/password</td><td>تغيير كلمة المرور</td><td class="c">مطلوب</td></tr>
+    <tr><td class="ys-m">POST</td><td class="ys-m">/refresh</td><td>تجديد رمز الجلسة</td><td class="c">عام</td></tr>
+    <tr><td class="ys-m">POST</td><td class="ys-m">/forgot-password · /reset-password</td><td>استعادة كلمة المرور برمز مؤقّت</td><td class="c">عام</td></tr>
+    <tr><td class="ys-m">GET</td><td class="ys-m">/check/:type/:value</td><td>التحقق الفوري من توفّر البريد أو الاسم أو الجوال</td><td class="c">عام</td></tr>
+    <tr><td rowspan="2">النشرة</td><td class="ys-m">POST</td><td class="ys-m">/newsletter/subscribe</td><td>الاشتراك — متاح للزائر والمسجّل</td><td class="c">عام</td></tr>
+    <tr><td class="ys-m">GET</td><td class="ys-m">/newsletter/unsubscribe/:token</td><td>إلغاء الاشتراك برابط شخصي</td><td class="c">عام</td></tr>
+    <tr><td rowspan="2">التحليلات</td><td class="ys-m">POST</td><td class="ys-m">/track/visit</td><td>تسجيل زيارة صفحة مع الدولة والمنطقة</td><td class="c">اختياري</td></tr>
+    <tr><td class="ys-m">POST</td><td class="ys-m">/track/search</td><td>تسجيل بحث مع الكلمة وعدد النتائج</td><td class="c">اختياري</td></tr>
+    <tr><td rowspan="5">المحتوى</td><td class="ys-m">GET</td><td class="ys-m">/cms/home</td><td>محتوى الصفحة الرئيسية</td><td class="c">عام</td></tr>
+    <tr><td class="ys-m">GET</td><td class="ys-m">/cms/pages</td><td>قائمة صفحات الموقع</td><td class="c">عام</td></tr>
+    <tr><td class="ys-m">GET</td><td class="ys-m">/cms/page/:code</td><td>محتوى صفحة محدّدة</td><td class="c">عام</td></tr>
+    <tr><td class="ys-m">GET</td><td class="ys-m">/cms/section/:code</td><td>محتوى قسم محدّد</td><td class="c">عام</td></tr>
+    <tr><td class="ys-m">GET</td><td class="ys-m">/cms/graph</td><td>بيانات الرسم الشبكي للتصنيفات</td><td class="c">عام</td></tr>
+    </tbody></table></div></section>
+
+  <section><div class="ys-sh"><span class="ys-n">07</span><h2>لوحات التحكم والتحليلات</h2></div>
+  <div class="ys-tw"><table>
+    <thead><tr><th style="width:22%">اللوحة</th><th class="c" style="width:9%">مؤشرات</th><th class="c" style="width:9%">مخططات</th><th>أبرز ما تقيسه</th></tr></thead><tbody>
+    <tr><td>تحليلات المستخدمين والدخول</td><td class="ys-num">24</td><td class="ys-num">17</td><td>التسجيلات اليومية والشهرية · أنواع المستخدمين · الجنس والفئات العمرية · الجامعات والتخصصات والدرجات · الدول والمدن · أوقات وأيام ذروة الدخول · الجلسات النشطة · التسجيل عبر Google مقابل العادي</td></tr>
+    <tr><td>تحليلات الزيارات والبحث</td><td class="ys-num">16</td><td class="ys-num">15</td><td><b>الصفحات الأكثر زيارة</b> · <b>الكلمات الأكثر بحثاً</b> · <b>البحث بلا نتائج</b> · مناطق المملكة والمدن · الدول · الزوّار الفريدون · مسجّل مقابل زائر · ساعات وأيام الذروة · الأجهزة والمتصفحات</td></tr>
+    <tr><td>إدارة النشرة البريدية</td><td class="ys-num">9</td><td class="c">—</td><td>المشتركون النشطون والملغون · نموّ الاشتراكات · محرّر نشرات بمعاينة حيّة · إرسال جماعي وسجل تفصيلي لكل رسالة</td></tr>
+    </tbody></table></div></section>
+
+  <section><div class="ys-sh"><span class="ys-n">08</span><h2>آلية احتساب التحليلات</h2></div>
+  <div class="ys-tw"><table>
+    <thead><tr><th style="width:22%">البند</th><th>الآلية</th></tr></thead><tbody>
+    <tr><td>تسجيل الزيارة</td><td>يُسجَّل عند كل انتقال بين الصفحات تلقائياً، مع تجاهل تكرار نفس الصفحة خلال ثوانٍ، واستبعاد زوّار الآلات (Bots)</td></tr>
+    <tr><td>تسجيل البحث</td><td>يُسجَّل بعد توقّف الكتابة بلحظة، للكلمات المكوّنة من حرفين فأكثر، مع حفظ عدد النتائج لرصد البحث غير المُجاب</td></tr>
+    <tr><td>هوية الزائر</td><td>معرّف مجهول يُنشأ في المتصفح للتمييز بين الزوّار الفريدين، ويُربط بحساب المستخدم تلقائياً عند تسجيل دخوله</td></tr>
+    <tr><td>تمييز المسجّل عن الزائر</td><td>يُستخرج معرّف المستخدم من رمز الجلسة في الخادم — لا يُرسله المتصفح، فلا يمكن تزويره</td></tr>
+    <tr><td>الجهاز والمتصفح</td><td>يُستنتج نوع الجهاز والمتصفح ونظام التشغيل من بصمة المتصفح دون معلومات شخصية</td></tr>
+    <tr><td>أثر الأداء</td><td>الإرسال بأسلوب «أطلق وانسَ» — لا ينتظره المتصفح، فلا تأثير على سرعة التصفّح</td></tr>
+    <tr><td>الخصوصية</td><td><b>لا يُخزَّن عنوان IP إطلاقاً</b> — تُحفظ الدولة والمنطقة والمدينة فقط</td></tr>
+    </tbody></table></div></section>
+
+  <section><div class="ys-sh"><span class="ys-n">09</span><h2>التحليلات الجغرافية — الدول والمناطق</h2></div>
+  <p class="ys-note">تُحدَّد جغرافيا الزائر على مستوى شبكة الحافة قبل وصول الطلب إلى قاعدة البيانات، ثم تُترجم رموز المناطق إلى أسمائها العربية عبر جدول مرجعي.</p>
+  <div class="ys-tw"><table>
+    <thead><tr><th style="width:18%">الحقل</th><th style="width:24%">المصدر</th><th style="width:20%">المعيار</th><th>مثال</th></tr></thead><tbody>
+    <tr><td>الدولة</td><td>ترويسة شبكة الحافة</td><td>ISO 3166-1 alpha-2</td><td class="ys-m">SA</td></tr>
+    <tr><td>المنطقة</td><td>ترويسة شبكة الحافة</td><td>ISO 3166-2</td><td class="ys-m">SA-01 → الرياض</td></tr>
+    <tr><td>المدينة</td><td>ترويسة شبكة الحافة</td><td>اسم نصّي</td><td>Riyadh</td></tr>
+    <tr><td>الترجمة العربية</td><td>جدول مرجعي في قاعدة البيانات</td><td>13 منطقة إدارية</td><td>تحويل الرمز إلى الاسم الرسمي</td></tr>
+    </tbody></table></div>
+
+  <p class="ys-note" style="margin-top:18px">مناطق المملكة الثلاث عشرة المرصودة، وتُحتسب زياراتها وزوّارها الفريدون بشكل مستقل:</p>
+  <div class="ys-tw"><table>
+    <thead><tr><th class="c" style="width:12%">الرمز</th><th style="width:38%">المنطقة</th><th class="c" style="width:12%">الرمز</th><th>المنطقة</th></tr></thead><tbody>
+    <tr><td class="c ys-m">SA-01</td><td>الرياض</td><td class="c ys-m">SA-08</td><td>الحدود الشمالية</td></tr>
+    <tr><td class="c ys-m">SA-02</td><td>مكة المكرمة</td><td class="c ys-m">SA-09</td><td>جازان</td></tr>
+    <tr><td class="c ys-m">SA-03</td><td>المدينة المنورة</td><td class="c ys-m">SA-10</td><td>نجران</td></tr>
+    <tr><td class="c ys-m">SA-04</td><td>المنطقة الشرقية</td><td class="c ys-m">SA-11</td><td>الباحة</td></tr>
+    <tr><td class="c ys-m">SA-05</td><td>القصيم</td><td class="c ys-m">SA-12</td><td>الجوف</td></tr>
+    <tr><td class="c ys-m">SA-06</td><td>حائل</td><td class="c ys-m">SA-14</td><td>عسير</td></tr>
+    <tr><td class="c ys-m">SA-07</td><td>تبوك</td><td class="c">—</td><td>—</td></tr>
+    </tbody></table></div>
+
+  <p class="ys-note" style="margin-top:18px">المؤشرات الجغرافية المحسوبة في لوحة التحليلات:</p>
+  <div class="ys-tw"><table>
+    <thead><tr><th style="width:26%">المؤشر</th><th>الوصف</th></tr></thead><tbody>
+    <tr><td>الزيارات حسب المنطقة</td><td>ترتيب مناطق المملكة تنازلياً بعدد الزيارات، مع النسبة المئوية لكل منطقة</td></tr>
+    <tr><td>الزيارات حسب الدولة</td><td>توزيع الزوّار على الدول مع تمييز الزيارات المحلية عن الخارجية</td></tr>
+    <tr><td>أعلى المدن</td><td>أكثر المدن نشاطاً داخل المملكة وخارجها</td></tr>
+    <tr><td>عدد المناطق المغطّاة</td><td>كم منطقة سعودية وصلها المحتوى فعلياً — مؤشر انتشار جغرافي</td></tr>
+    <tr><td>عدد الدول</td><td>اتساع الوصول الدولي للمنصة</td></tr>
+    <tr><td>الزوّار الفريدون لكل منطقة</td><td>تمييز الأشخاص عن عدد الزيارات لقياس الوصول الحقيقي</td></tr>
+    <tr><td>الاهتمام حسب المنطقة</td><td>ربط المناطق بالصفحات وكلمات البحث الأكثر طلباً فيها</td></tr>
+    </tbody></table></div></section>
+
+  <section><div class="ys-sh"><span class="ys-n">10</span><h2>الأمان وحماية البيانات</h2></div>
+  <div class="ys-tw"><table>
+    <thead><tr><th style="width:26%">العنصر</th><th>التطبيق</th></tr></thead><tbody>
+    <tr><td>تشفير كلمات المرور</td><td>تجزئة SHA-256 مع مِلح عشوائي بطول 128 بت لكل مستخدم — لا تُخزَّن كلمة المرور نصّاً</td></tr>
+    <tr><td>رموز الجلسات</td><td>رموز عشوائية بطول 64 محرفاً بصلاحية محدّدة، مع رمز تجديد منفصل</td></tr>
+    <tr><td>نقل البيانات</td><td>تشفير HTTPS/TLS على جميع الطبقات دون استثناء</td></tr>
+    <tr><td>عزل قاعدة البيانات</td><td>المتصفّح لا يتصل بخادم البيانات مباشرةً — كل الطلبات عبر بروكسي خادمي يُخفي عنوان الخادم</td></tr>
+    <tr><td>الدخول عبر Google</td><td>التحقق من الرمز لدى Google مع مطابقة معرّف التطبيق ومُصدِر الرمز وتأكيد البريد</td></tr>
+    <tr><td>منع تكرار الحسابات</td><td>فهارس فريدة على البريد تمنع الحسابات المكرّرة، وتوليد أسماء مستخدمين فريدة تلقائياً</td></tr>
+    <tr><td>حماية المسارات</td><td>طبقة وسيطة تمنع الوصول للصفحات الخاصة دون جلسة صالحة</td></tr>
+    <tr><td>حماية المدخلات</td><td>استعلامات مُعامَلة (Bind Variables) تمنع الحقن البرمجي، وتحقّق مزدوج في الواجهة والخادم</td></tr>
+    <tr><td>عزل بيانات الاعتماد</td><td>المفاتيح والأسرار في متغيّرات بيئة خادمية — لا تصل إلى المتصفح ولا إلى مستودع الكود</td></tr>
+    </tbody></table></div></section>
+
+  <section><div class="ys-sh"><span class="ys-n">11</span><h2>التكاملات الخارجية</h2></div>
+  <div class="ys-tw"><table>
+    <thead><tr><th style="width:22%">التكامل</th><th style="width:26%">التقنية</th><th>الغرض</th></tr></thead><tbody>
+    <tr><td>Google Sign-In</td><td>OAuth 2.0 / OpenID Connect</td><td>دخول أو إنشاء حساب بنقرة واحدة، مع ربط تلقائي بالحساب القائم عند تطابق البريد</td></tr>
+    <tr><td>Microsoft 365</td><td>Microsoft Graph API</td><td>إرسال النشرة البريدية من العنوان الرسمي للمنصة</td></tr>
+    <tr><td>شبكة الحافة</td><td>ترويسات جغرافية</td><td>تحديد دولة ومنطقة الزائر دون خدمات خارجية ودون تخزين عنوان IP</td></tr>
+    <tr><td>Cloudflare</td><td>إدارة DNS</td><td>توجيه النطاق الرسمي وإدارة سجلاته</td></tr>
+    </tbody></table></div></section>
+
+  <section><div class="ys-sh"><span class="ys-n">12</span><h2>الميزات الوظيفية</h2></div>
+  <div class="ys-tw"><table>
+    <thead><tr><th style="width:24%">الميزة</th><th>الوصف</th><th class="c" style="width:11%">الحالة</th></tr></thead><tbody>
+    <tr><td>إدارة الحسابات</td><td>تسجيل · دخول · تسجيل عبر Google · استعادة كلمة المرور · الملف الشخصي</td><td class="c"><span class="ys-p ok">مكتملة</span></td></tr>
+    <tr><td>قواعد البيانات المعرفية</td><td>14 قاعدة قابلة للتصفّح والتصفية والعرض التفصيلي</td><td class="c"><span class="ys-p ok">مكتملة</span></td></tr>
+    <tr><td>البحث الموحّد</td><td>بحث بالكلمات المفتاحية عبر جميع الأقسام مع تسجيل تحليلي لكل عملية</td><td class="c"><span class="ys-p ok">مكتملة</span></td></tr>
+    <tr><td>الإحصاءات والمؤشرات</td><td>مخططات تفاعلية وخرائط لمناطق المملكة</td><td class="c"><span class="ys-p ok">مكتملة</span></td></tr>
+    <tr><td>تصدير البيانات</td><td>تصدير الجداول والنتائج إلى ملفات Excel</td><td class="c"><span class="ys-p ok">مكتملة</span></td></tr>
+    <tr><td>النشرة البريدية</td><td>اشتراك مفتوح للجميع · محرّر بمعاينة حيّة · إرسال جماعي وسجل تفصيلي</td><td class="c"><span class="ys-p ok">مكتملة</span></td></tr>
+    <tr><td>إدارة المحتوى</td><td>تحكّم بصفحات وأقسام الموقع من لوحة الإدارة دون تعديل برمجي</td><td class="c"><span class="ys-p ok">مكتملة</span></td></tr>
+    <tr><td>لوحات التحليلات</td><td>ثلاث لوحات تغطي المستخدمين والزيارات والبحث والنشرة</td><td class="c"><span class="ys-p ok">مكتملة</span></td></tr>
+    </tbody></table></div></section>
+
+  <section><div class="ys-sh"><span class="ys-n">13</span><h2>الأداء والتوافق</h2></div>
+  <div class="ys-tw"><table>
+    <thead><tr><th style="width:26%">البند</th><th>المواصفة</th></tr></thead><tbody>
+    <tr><td>أسلوب العرض</td><td>توليد من الخادم (SSR) مع تخزين مؤقت ذكي للمحتوى المتكرّر</td></tr>
+    <tr><td>التوزيع الجغرافي</td><td>خوادم حافة موزّعة عالمياً تُقلّل زمن الاستجابة للزائر</td></tr>
+    <tr><td>التجاوب</td><td>يعمل على الجوال واللوحي وسطح المكتب بتخطيطات مُحسّنة لكل مقاس</td></tr>
+    <tr><td>المتصفحات المدعومة</td><td>Chrome · Safari · Edge · Firefox — الإصدارات الحديثة</td></tr>
+    <tr><td>دعم اللغة العربية</td><td>دعم كامل لاتجاه RTL في الواجهة والجداول والمخططات وقاعدة البيانات</td></tr>
+    <tr><td>الوصولية</td><td>عناصر واجهة متوافقة مع معايير الوصولية ودعم التنقّل بلوحة المفاتيح</td></tr>
+    <tr><td>مشاركة الروابط</td><td>بيانات وصفية كاملة (Open Graph) لعرض شعار المنصة وعنوانها عند المشاركة</td></tr>
+    </tbody></table></div></section>
+
+</div>
+
+<style>
+#yd-specs{--nv:#1e2a52;--gd:#a8845c;--bg:#f5f7fb;--sf:#fff;--sf2:#fafbfe;--bd:#dfe4f0;--bds:#c6cee0;--tx:#19203a;--mu:#5b6580;font-family:'IBM Plex Sans Arabic','Noto Sans Arabic','Segoe UI',Tahoma,sans-serif;color:var(--tx);background:var(--bg);font-size:15px;line-height:1.75;padding:34px 26px 56px;max-width:1140px;margin:0 auto}
+#yd-specs *{box-sizing:border-box}
+#yd-specs .ys-m,#yd-specs .ys-num,#yd-specs .ys-n,#yd-specs .ys-eyebrow,#yd-specs .ys-fig .n{font-family:ui-monospace,Consolas,monospace;font-variant-numeric:tabular-nums}
+#yd-specs .ys-m{font-size:.86em}
+#yd-specs .ys-head{border-bottom:2px solid var(--nv);padding-bottom:20px}
+#yd-specs .ys-eyebrow{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gd);margin:0 0 9px}
+#yd-specs h1{margin:0;font-size:clamp(1.55rem,3.4vw,2.15rem);font-weight:800;letter-spacing:-.02em;color:var(--nv);line-height:1.3;text-wrap:balance}
+#yd-specs .ys-sub{margin:9px 0 0;color:var(--mu);font-size:.98rem;max-width:64ch}
+#yd-specs .ys-meta{display:flex;flex-wrap:wrap;gap:7px 26px;margin-top:16px;font-size:.82rem;color:var(--mu)}
+#yd-specs .ys-meta b{color:var(--tx);font-weight:600}
+#yd-specs .ys-figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(126px,1fr));gap:1px;background:var(--bd);border:1px solid var(--bd);margin:26px 0 40px}
+#yd-specs .ys-fig{background:var(--sf);padding:14px 16px}
+#yd-specs .ys-fig .n{font-size:1.5rem;font-weight:700;color:var(--nv);line-height:1.1}
+#yd-specs .ys-fig .l{font-size:.76rem;color:var(--mu);margin-top:3px}
+#yd-specs section{margin:0 0 38px}
+#yd-specs .ys-sh{display:flex;align-items:baseline;gap:11px;margin:0 0 13px;border-bottom:1px solid var(--bds);padding-bottom:8px}
+#yd-specs .ys-n{font-size:.78rem;font-weight:600;color:var(--gd);flex:none}
+#yd-specs .ys-sh h2{margin:0;font-size:1.08rem;font-weight:700;color:var(--nv);letter-spacing:-.01em}
+#yd-specs .ys-note{font-size:.85rem;color:var(--mu);margin:0 0 13px;max-width:72ch}
+#yd-specs .ys-tw{overflow-x:auto;border:1px solid var(--bd);background:var(--sf)}
+#yd-specs table{border-collapse:collapse;width:100%;min-width:520px;font-size:.85rem;margin:0}
+#yd-specs thead th{background:var(--nv);color:#f2f5fc;font-weight:600;text-align:right;padding:9px 13px;white-space:nowrap;font-size:.79rem;border:none}
+#yd-specs tbody td{padding:8px 13px;border-top:1px solid var(--bd);border-left:none;border-right:none;vertical-align:top;text-align:right;background:transparent}
+#yd-specs tbody tr:nth-child(even) td{background:var(--sf2)}
+#yd-specs tbody td:first-child{font-weight:600;color:var(--tx);white-space:nowrap}
+#yd-specs td.c,#yd-specs th.c,#yd-specs .ys-num{text-align:center}
+#yd-specs .ys-p{display:inline-block;padding:1px 9px;font-size:.71rem;font-weight:600;border-radius:2px;white-space:nowrap}
+#yd-specs .ys-p.ok{background:#e6f3ed;color:#2c7a5c}
+@media(max-width:640px){#yd-specs{padding:22px 14px 44px}#yd-specs tbody td:first-child{white-space:normal}}
+@media print{#yd-specs{background:#fff;padding:0;max-width:100%}#yd-specs section{break-inside:avoid}#yd-specs .ys-tw{overflow:visible}#yd-specs thead th{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
