@@ -82,6 +82,20 @@
     </div>
   </div>
 
+  <!-- نافذة الردود -->
+  <div id="sv-resp-modal" class="sv-modal" style="display:none">
+    <div class="sv-modal-box">
+      <div class="sv-modal-head">
+        <h3 id="sv-resp-title">ردود الاستبيان</h3>
+        <div>
+          <button type="button" id="sv-export" class="sv-btn green mini">⬇ تصدير CSV/Excel</button>
+          <button type="button" id="sv-resp-close" class="sv-btn ghost mini">إغلاق</button>
+        </div>
+      </div>
+      <div class="sv-modal-body"><div id="sv-resp-content"></div></div>
+    </div>
+  </div>
+
   <div id="sv-toast" class="sv-toast"></div>
 </div>
 
@@ -134,6 +148,15 @@
 #sv-admin #sv-status-line{margin-bottom:12px}
 #sv-admin .sv-toast{position:fixed;bottom:20px;inset-inline-start:20px;background:#1e2a52;color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;opacity:0;transition:.3s;pointer-events:none;z-index:9999}
 #sv-admin .sv-toast.show{opacity:1}
+#sv-admin .sv-modal{position:fixed;inset:0;background:rgba(15,20,36,.55);display:flex;align-items:center;justify-content:center;z-index:9998;padding:20px}
+#sv-admin .sv-modal-box{background:#fff;border-radius:14px;width:min(1000px,96vw);max-height:88vh;display:flex;flex-direction:column;overflow:hidden}
+#sv-admin .sv-modal-head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid #eef1f8}
+#sv-admin .sv-modal-head h3{margin:0;font-size:15px;color:#1e2a52}
+#sv-admin .sv-modal-body{overflow:auto;padding:0}
+#sv-admin .sv-rtable{width:100%;border-collapse:collapse;font-size:12.5px;white-space:nowrap}
+#sv-admin .sv-rtable th{position:sticky;top:0;background:#1e2a52;color:#fff;padding:8px 11px;text-align:right;font-weight:600}
+#sv-admin .sv-rtable td{padding:7px 11px;border-top:1px solid #eef1f8;text-align:right;max-width:280px;overflow:hidden;text-overflow:ellipsis}
+#sv-admin .sv-rtable tr:nth-child(even) td{background:#f7f9fd}
 @media(max-width:700px){#sv-admin .sv-grid2,#sv-admin .sv-grid3{grid-template-columns:1fr}}
 </style>
 
@@ -157,6 +180,7 @@
         var act='<button type="button" class="sv-btn mini" data-a="open" data-id="'+r.id+'">تحرير</button>';
         if(r.status==='pending') act+=' <button type="button" class="sv-btn mini green" data-a="approve" data-id="'+r.id+'">اعتماد</button> <button type="button" class="sv-btn mini danger" data-a="reject" data-id="'+r.id+'">رفض</button>';
         if(r.status==='approved') act+=' <button type="button" class="sv-btn mini gold" data-a="publish" data-id="'+r.id+'">نشر</button>';
+        if(r.responses>0) act+=' <button type="button" class="sv-btn mini" data-a="resp" data-id="'+r.id+'">📊</button>';
         act+=' <button type="button" class="sv-btn mini danger" data-a="del" data-id="'+r.id+'">حذف</button>';
         var home='<button type="button" class="sv-btn mini '+(r.onHome?'green':'ghost')+'" data-a="home" data-id="'+r.id+'">'+(r.onHome?'✓':'—')+'</button>';
         var an='<button type="button" class="sv-btn mini '+(r.onAnalytics?'green':'ghost')+'" data-a="an" data-id="'+r.id+'">'+(r.onAnalytics?'✓':'—')+'</button>';
@@ -228,6 +252,7 @@
     else if(status==='pending') h='<span class="sv-note">بانتظار اعتماد المدير</span><button type="button" class="sv-btn green" data-a="approve">اعتماد</button><button type="button" class="sv-btn danger" data-a="reject">رفض</button>';
     else if(status==='approved') h='<button type="button" class="sv-btn gold" data-a="publish">نشر في المنصة</button>';
     else if(status==='published') h='<span class="badge published">منشور</span> <button type="button" class="sv-btn ghost" data-a="close">إغلاق</button> <a href="https://youthdata.sa/surveys/'+esc(ST.slug||('survey-'+CUR))+'" target="_blank" class="sv-btn ghost" style="text-decoration:none">فتح في المنصة ↗</a>';
+    h+=' <button type="button" class="sv-btn" data-a="responses" data-id="'+CUR+'">📊 الردود والتصدير</button>';
     document.getElementById('sv-workflow').innerHTML=h;
   }
 
@@ -249,8 +274,46 @@
       settings:JSON.stringify(s)});
   }
 
+  // ---------- الردود والتصدير ----------
+  var RESP=null;
+  function openResponses(id){
+    p({x01:'responses',x02:id}).then(function(d){
+      RESP=d;
+      var amap={}; (d.answers||[]).forEach(function(x){ (amap[x.r]=amap[x.r]||{})[x.q]=x.v; });
+      RESP._amap=amap;
+      var cols=d.columns||[];
+      var head='<tr><th>#</th><th>البريد</th><th>الاسم</th><th>التاريخ</th><th>المنطقة</th><th>مسجّل</th>'+cols.map(function(c){return '<th>'+esc(c.text.substring(0,40))+'</th>'}).join('')+'</tr>';
+      var body=(d.responses||[]).map(function(r){
+        var m=amap[r.id]||{};
+        return '<tr><td>'+r.id+'</td><td>'+esc(r.email||'')+'</td><td>'+esc(r.name||'')+'</td><td>'+esc(r.date||'')+'</td><td>'+esc(r.region||r.country||'')+'</td><td>'+(r.registered?'✓':'—')+'</td>'+cols.map(function(c){return '<td>'+esc(m[c.id]||'')+'</td>'}).join('')+'</tr>';
+      }).join('');
+      document.getElementById('sv-resp-title').textContent='ردود الاستبيان ('+(d.responses||[]).length+')';
+      document.getElementById('sv-resp-content').innerHTML=(d.responses&&d.responses.length)?('<table class="sv-rtable"><thead>'+head+'</thead><tbody>'+body+'</tbody></table>'):'<p style="padding:24px;text-align:center;color:#94a3b8">لا ردود بعد</p>';
+      document.getElementById('sv-resp-modal').style.display='flex';
+    });
+  }
+  function exportCSV(){
+    if(!RESP) return;
+    var cols=RESP.columns||[], m=RESP._amap||{};
+    var head=['#','البريد','الاسم','التاريخ','المنطقة','المدينة','الدولة','مسجّل'].concat(cols.map(function(c){return c.text}));
+    function cell(v){v=(v==null?'':String(v)); return '"'+v.replace(/"/g,'""')+'"';}
+    var lines=[head.map(cell).join(',')];
+    (RESP.responses||[]).forEach(function(r){
+      var am=m[r.id]||{};
+      var row=[r.id,r.email,r.name,r.date,r.region,r.city,r.country,r.registered?'نعم':'لا'].concat(cols.map(function(c){return am[c.id]||''}));
+      lines.push(row.map(cell).join(','));
+    });
+    var csv='﻿'+lines.join('\r\n'); // BOM لدعم العربية في Excel
+    var blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+    var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+    a.download='survey-'+(CUR||'')+'-responses.csv'; document.body.appendChild(a); a.click(); a.remove();
+  }
+
   function boot(){
     document.getElementById('sv-admin').addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.tagName==='INPUT')e.preventDefault()});
+    document.getElementById('sv-resp-close').addEventListener('click',function(){document.getElementById('sv-resp-modal').style.display='none'});
+    document.getElementById('sv-export').addEventListener('click',exportCSV);
+    document.getElementById('sv-resp-modal').addEventListener('click',function(e){if(e.target.id==='sv-resp-modal')e.target.style.display='none'});
     document.getElementById('sv-new').addEventListener('click',function(){var t=prompt('عنوان الاستبيان الجديد:');if(t)p({x01:'create',x03:t}).then(function(r){openSurvey(r.id)})});
     document.getElementById('sv-back').addEventListener('click',showList);
     document.getElementById('sv-savemeta').addEventListener('click',function(){p({x01:'savemeta',x02:CUR,p_clob_01:metaJSON()}).then(function(){toast('حُفظت البيانات')})});
@@ -268,6 +331,7 @@
       else if(a==='publish') p({x01:'publish',x02:id}).then(function(){toast('نُشر');loadList()});
       else if(a==='home') p({x01:'toggle_home',x02:id}).then(loadList);
       else if(a==='an') p({x01:'toggle_analytics',x02:id}).then(loadList);
+      else if(a==='resp'){ CUR=id; openResponses(id); }
     });
 
     // المحرّر (تفويض)
@@ -282,6 +346,7 @@
       else if(a==='reject'){var r=prompt('سبب الرفض:');if(r!=null)p({x01:'reject',x02:CUR,x03:r}).then(function(){openSurvey(CUR)})}
       else if(a==='publish') p({x01:'publish',x02:CUR}).then(function(){toast('نُشر');openSurvey(CUR)});
       else if(a==='close') p({x01:'close',x02:CUR}).then(function(){openSurvey(CUR)});
+      else if(a==='responses') openResponses(b.dataset.id);
     });
     // حفظ نص الخيار عند مغادرته
     document.getElementById('sv-editor').addEventListener('change',function(e){if(e.target.hasAttribute&&e.target.hasAttribute('data-opt'))p({x01:'saveopt',x02:e.target.getAttribute('data-opt'),x03:e.target.value})});

@@ -210,5 +210,50 @@ BEGIN
     APEX_JSON.open_object; APEX_JSON.write('success',TRUE); APEX_JSON.close_object; RETURN;
   END IF;
 
+  -- ---------- الردود (عرض + تصدير) ----------
+  IF a='responses' THEN
+    l_id := TO_NUMBER(p2);
+    APEX_JSON.open_object;
+    -- الأعمدة (الأسئلة)
+    APEX_JSON.open_array('columns');
+    FOR q IN (SELECT "ID","QTEXT" FROM "SURVEY_QUESTIONS" WHERE "SURVEY_ID"=l_id ORDER BY "DISPLAY_ORDER","ID") LOOP
+      APEX_JSON.open_object; APEX_JSON.write('id',q."ID"); APEX_JSON.write('text',q."QTEXT"); APEX_JSON.close_object;
+    END LOOP;
+    APEX_JSON.close_array;
+    -- الجلسات
+    APEX_JSON.open_array('responses');
+    FOR r IN (SELECT "ID","EMAIL","RESPONDENT",TO_CHAR("SUBMITTED_AT",'YYYY-MM-DD HH24:MI') dt,
+                     "REGION","CITY","COUNTRY","USER_ID"
+              FROM "SURVEY_RESPONSES" WHERE "SURVEY_ID"=l_id
+              ORDER BY "ID" DESC FETCH FIRST 5000 ROWS ONLY) LOOP
+      APEX_JSON.open_object;
+        APEX_JSON.write('id',r."ID"); APEX_JSON.write('email',r."EMAIL");
+        APEX_JSON.write('name',r."RESPONDENT"); APEX_JSON.write('date',r.dt);
+        APEX_JSON.write('region',r."REGION"); APEX_JSON.write('city',r."CITY");
+        APEX_JSON.write('country',r."COUNTRY");
+        APEX_JSON.write('registered', CASE WHEN r."USER_ID" IS NOT NULL THEN TRUE ELSE FALSE END);
+      APEX_JSON.close_object;
+    END LOOP;
+    APEX_JSON.close_array;
+    -- الإجابات (قيمة نصية لكل سؤال في كل جلسة؛ الاختيار المتعدد مدموج)
+    APEX_JSON.open_array('answers');
+    FOR x IN (
+      SELECT a."RESPONSE_ID" r, a."QUESTION_ID" q,
+             LISTAGG(NVL(o."OPT_TEXT", NVL(a."ANSWER_TEXT", TO_CHAR(a."ANSWER_NUMBER"))), ' | ')
+               WITHIN GROUP (ORDER BY a."ID") v
+      FROM "SURVEY_ANSWERS" a
+      LEFT JOIN "SURVEY_OPTIONS" o ON o."ID"=a."OPTION_ID"
+      JOIN "SURVEY_RESPONSES" rs ON rs."ID"=a."RESPONSE_ID"
+      WHERE rs."SURVEY_ID"=l_id
+      GROUP BY a."RESPONSE_ID", a."QUESTION_ID"
+    ) LOOP
+      APEX_JSON.open_object;
+        APEX_JSON.write('r',x.r); APEX_JSON.write('q',x.q); APEX_JSON.write('v',x.v);
+      APEX_JSON.close_object;
+    END LOOP;
+    APEX_JSON.close_array;
+    APEX_JSON.close_object; RETURN;
+  END IF;
+
   APEX_JSON.open_object; APEX_JSON.write('success',FALSE); APEX_JSON.write('error','إجراء غير معروف'); APEX_JSON.close_object;
 END;
