@@ -14,11 +14,19 @@ BEGIN
 DECLARE
   l_total NUMBER;
   l_avg   NUMBER;
+  l_sc    NUMBER;
+  l_tr    NUMBER;
 BEGIN
   OWA_UTIL.mime_header('application/json', FALSE, 'UTF-8');
   HTP.p('Access-Control-Allow-Origin: *'); OWA_UTIL.http_header_close;
+
+  SELECT COUNT(*), NVL(SUM("RESPONSE_COUNT"),0) INTO l_sc, l_tr
+  FROM "SURVEYS" WHERE "STATUS"='published' AND "SHOW_ANALYTICS"=1;
+
   APEX_JSON.initialize_clob_output;
   APEX_JSON.open_object;
+  APEX_JSON.write('surveyCount', l_sc);
+  APEX_JSON.write('totalResponses', l_tr);
   APEX_JSON.open_array('surveys');
 
   FOR s IN (SELECT "ID","TITLE","RESPONSE_COUNT","COVER_COLOR"
