@@ -1,0 +1,293 @@
+<div id="sv-admin" dir="rtl">
+  <div class="sv-head">
+    <h2>إدارة الاستبيانات</h2>
+    <div>
+      <button type="button" id="sv-new" class="sv-btn">+ استبيان جديد</button>
+      <button type="button" id="sv-back" class="sv-btn ghost" style="display:none">‹ رجوع للقائمة</button>
+    </div>
+  </div>
+
+  <!-- القائمة -->
+  <div id="sv-list-view">
+    <div class="sv-tablewrap"><table class="sv-table">
+      <thead><tr><th>#</th><th>العنوان</th><th>الحالة</th><th>أسئلة</th><th>ردود</th><th>الرئيسية</th><th>تحليلات</th><th>إجراءات</th></tr></thead>
+      <tbody id="sv-list"></tbody>
+    </table></div>
+  </div>
+
+  <!-- المحرّر -->
+  <div id="sv-editor" style="display:none">
+    <div class="sv-card">
+      <h3>بيانات الاستبيان</h3>
+      <div id="sv-status-line"></div>
+      <div class="sv-grid2">
+        <label>العنوان<input id="m-title" type="text"></label>
+        <label>الرابط (slug)<input id="m-slug" type="text" placeholder="يُولّد تلقائياً"></label>
+      </div>
+      <label>الوصف<textarea id="m-desc" rows="2"></textarea></label>
+      <div class="sv-grid2">
+        <label>نص ترحيبي<textarea id="m-intro" rows="2"></textarea></label>
+        <label>رسالة الشكر<textarea id="m-thanks" rows="2"></textarea></label>
+      </div>
+      <div class="sv-grid3">
+        <label>اللون<input id="m-color" type="color" value="#1e2a52" class="sv-color"></label>
+        <label class="sv-chk"><input id="m-login" type="checkbox"> يتطلب تسجيل دخول</label>
+        <label class="sv-chk"><input id="m-multi" type="checkbox"> يسمح بعدة ردود</label>
+        <label class="sv-chk"><input id="m-email" type="checkbox" checked> البريد إلزامي</label>
+      </div>
+      <button type="button" id="sv-savemeta" class="sv-btn">حفظ البيانات</button>
+    </div>
+
+    <div class="sv-card">
+      <div class="sv-qh">
+        <h3>الأسئلة</h3>
+        <div class="sv-addq">
+          <select id="sv-qtype">
+            <option value="single">اختيار واحد</option>
+            <option value="multiple">اختيار متعدد</option>
+            <option value="dropdown">قائمة منسدلة</option>
+            <option value="short_text">نص قصير</option>
+            <option value="long_text">نص طويل</option>
+            <option value="number">رقم</option>
+            <option value="date">تاريخ</option>
+            <option value="rating">تقييم نجوم</option>
+            <option value="scale">مقياس خطي</option>
+            <option value="grid">شبكة</option>
+            <option value="yesno">نعم / لا</option>
+            <option value="email">بريد</option>
+            <option value="phone">هاتف</option>
+          </select>
+          <button type="button" id="sv-addq" class="sv-btn">+ إضافة سؤال</button>
+        </div>
+      </div>
+      <div id="sv-questions"></div>
+    </div>
+
+    <div class="sv-card">
+      <h3>المنطق الشرطي (اختياري)</h3>
+      <p class="sv-note">أظهر/أخفِ سؤالاً بناءً على إجابة سؤال آخر.</p>
+      <div id="sv-conds"></div>
+      <div class="sv-cond-add">
+        <span>أظهِر</span>
+        <select id="c-target"></select><span>إذا كانت إجابة</span>
+        <select id="c-source"></select>
+        <select id="c-op"><option value="equals">تساوي</option><option value="not_equals">لا تساوي</option><option value="contains">تحتوي</option></select>
+        <input id="c-val" type="text" placeholder="القيمة">
+        <button type="button" id="sv-addcond" class="sv-btn mini">إضافة شرط</button>
+      </div>
+    </div>
+
+    <div class="sv-card sv-actions">
+      <div id="sv-workflow"></div>
+    </div>
+  </div>
+
+  <div id="sv-toast" class="sv-toast"></div>
+</div>
+
+<style>
+#sv-admin{font-family:'IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif;color:#19203a}
+#sv-admin *{box-sizing:border-box}
+#sv-admin .sv-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+#sv-admin .sv-head h2{font-size:20px;font-weight:800;color:#1e2a52;margin:0}
+#sv-admin .sv-btn{background:#1e2a52;color:#fff;border:0;border-radius:9px;padding:8px 15px;font:inherit;font-weight:600;cursor:pointer}
+#sv-admin .sv-btn:hover{background:#2a3968}
+#sv-admin .sv-btn.ghost{background:#eef1f8;color:#334155}
+#sv-admin .sv-btn.mini{padding:5px 11px;font-size:12.5px}
+#sv-admin .sv-btn.gold{background:#a8845c}
+#sv-admin .sv-btn.danger{background:#fee2e2;color:#b91c1c}
+#sv-admin .sv-btn.green{background:#e4f4ec;color:#187a54}
+#sv-admin .sv-card{background:#fff;border:1px solid #e0e5f1;border-radius:14px;padding:18px;margin-bottom:16px}
+#sv-admin .sv-card h3{margin:0 0 12px;font-size:15px;color:#1e2a52}
+#sv-admin label{display:block;font-size:13px;font-weight:600;color:#475569;margin-bottom:10px}
+#sv-admin input,#sv-admin select,#sv-admin textarea{width:100%;border:1px solid #cbd5e1;border-radius:9px;padding:8px 11px;font:inherit;margin-top:4px;outline:none}
+#sv-admin input:focus,#sv-admin textarea:focus{border-color:#1e2a52}
+#sv-admin .sv-color{height:38px;padding:3px;cursor:pointer}
+#sv-admin .sv-chk{display:flex;align-items:center;gap:7px;font-weight:500}
+#sv-admin .sv-chk input{width:auto;margin:0}
+#sv-admin .sv-grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+#sv-admin .sv-grid3{display:grid;grid-template-columns:repeat(4,auto);gap:16px;align-items:center;margin-bottom:12px}
+#sv-admin .sv-tablewrap{overflow-x:auto;border:1px solid #e0e5f1;border-radius:12px;background:#fff}
+#sv-admin .sv-table{width:100%;border-collapse:collapse;font-size:13.5px}
+#sv-admin .sv-table th{background:#1e2a52;color:#fff;padding:9px 12px;text-align:right;font-weight:600;white-space:nowrap}
+#sv-admin .sv-table td{padding:9px 12px;border-top:1px solid #eef1f8;text-align:right}
+#sv-admin .badge{padding:2px 10px;border-radius:999px;font-size:11px;font-weight:700}
+#sv-admin .badge.draft{background:#e2e8f0;color:#475569}#sv-admin .badge.pending{background:#fef3c7;color:#92600e}
+#sv-admin .badge.approved{background:#dbeafe;color:#1e40af}#sv-admin .badge.published{background:#dcfce7;color:#166534}
+#sv-admin .badge.rejected{background:#fee2e2;color:#991b1b}#sv-admin .badge.closed{background:#f1f5f9;color:#64748b}
+#sv-admin .sv-qh{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+#sv-admin .sv-qh h3{margin:0}
+#sv-admin .sv-addq{display:flex;gap:8px}
+#sv-admin .sv-addq select{width:auto;margin:0}
+#sv-admin .qcard{border:1px solid #e0e5f1;border-radius:12px;padding:14px;margin-bottom:12px;background:#fafbfe}
+#sv-admin .qcard .qrow{display:flex;gap:10px;align-items:center;margin-bottom:8px}
+#sv-admin .qcard .qtype{font-size:11px;background:#eef1f8;color:#334155;padding:2px 9px;border-radius:6px;font-weight:700;white-space:nowrap}
+#sv-admin .qopts{margin:8px 0 0;padding-inline-start:0}
+#sv-admin .qopt{display:flex;gap:6px;align-items:center;margin-bottom:5px}
+#sv-admin .qflags{display:flex;gap:16px;margin-top:8px;font-size:12.5px}
+#sv-admin .cond{display:flex;gap:8px;align-items:center;font-size:13px;background:#f7f9fd;border:1px solid #eef1f8;border-radius:8px;padding:7px 11px;margin-bottom:6px}
+#sv-admin .sv-cond-add{display:flex;gap:7px;align-items:center;flex-wrap:wrap;font-size:13px;margin-top:10px}
+#sv-admin .sv-cond-add select,#sv-admin .sv-cond-add input{width:auto;margin:0}
+#sv-admin .sv-actions{display:flex;gap:10px;flex-wrap:wrap}
+#sv-admin #sv-workflow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+#sv-admin .sv-note{font-size:12.5px;color:#64748b;margin:0 0 8px}
+#sv-admin #sv-status-line{margin-bottom:12px}
+#sv-admin .sv-toast{position:fixed;bottom:20px;inset-inline-start:20px;background:#1e2a52;color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;opacity:0;transition:.3s;pointer-events:none;z-index:9999}
+#sv-admin .sv-toast.show{opacity:1}
+@media(max-width:700px){#sv-admin .sv-grid2,#sv-admin .sv-grid3{grid-template-columns:1fr}}
+</style>
+
+<script>
+(function(){
+  var CUR=null; // معرّف الاستبيان المفتوح
+  function toast(m){var t=document.getElementById('sv-toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2400)}
+  function esc(s){return (s==null?'':String(s)).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function p(d){return new Promise(function(res,rej){apex.server.process('SURVEY_ADMIN',d,{dataType:'json',success:res,error:rej})})}
+  var ST=null;
+  var TYPES={single:'اختيار واحد',multiple:'اختيار متعدد',dropdown:'قائمة',short_text:'نص قصير',long_text:'نص طويل',number:'رقم',date:'تاريخ',rating:'نجوم',scale:'مقياس',grid:'شبكة',yesno:'نعم/لا',email:'بريد',phone:'هاتف'};
+  var STL={draft:'مسودة',pending:'بانتظار الاعتماد',approved:'معتمد',published:'منشور',rejected:'مرفوض',closed:'مغلق'};
+  var CHOICE=['single','multiple','dropdown'];
+
+  function showList(){document.getElementById('sv-list-view').style.display='';document.getElementById('sv-editor').style.display='none';document.getElementById('sv-back').style.display='none';document.getElementById('sv-new').style.display='';CUR=null;loadList()}
+  function showEditor(){document.getElementById('sv-list-view').style.display='none';document.getElementById('sv-editor').style.display='';document.getElementById('sv-back').style.display='';document.getElementById('sv-new').style.display='none'}
+
+  function loadList(){
+    p({x01:'list'}).then(function(d){
+      document.getElementById('sv-list').innerHTML=(d.rows||[]).map(function(r){
+        var act='<button type="button" class="sv-btn mini" data-a="open" data-id="'+r.id+'">تحرير</button>';
+        if(r.status==='pending') act+=' <button type="button" class="sv-btn mini green" data-a="approve" data-id="'+r.id+'">اعتماد</button> <button type="button" class="sv-btn mini danger" data-a="reject" data-id="'+r.id+'">رفض</button>';
+        if(r.status==='approved') act+=' <button type="button" class="sv-btn mini gold" data-a="publish" data-id="'+r.id+'">نشر</button>';
+        act+=' <button type="button" class="sv-btn mini danger" data-a="del" data-id="'+r.id+'">حذف</button>';
+        var home='<button type="button" class="sv-btn mini '+(r.onHome?'green':'ghost')+'" data-a="home" data-id="'+r.id+'">'+(r.onHome?'✓':'—')+'</button>';
+        var an='<button type="button" class="sv-btn mini '+(r.onAnalytics?'green':'ghost')+'" data-a="an" data-id="'+r.id+'">'+(r.onAnalytics?'✓':'—')+'</button>';
+        return '<tr><td>'+r.id+'</td><td>'+esc(r.title)+'</td><td><span class="badge '+r.status+'">'+(STL[r.status]||r.status)+'</span></td><td>'+r.questions+'</td><td>'+r.responses+'</td><td>'+home+'</td><td>'+an+'</td><td>'+act+'</td></tr>';
+      }).join('') || '<tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:24px">لا استبيانات</td></tr>';
+    })
+  }
+
+  function openSurvey(id){
+    p({x01:'get',x02:id}).then(function(d){
+      CUR=id; ST=d;
+      document.getElementById('m-title').value=d.title||'';
+      document.getElementById('m-slug').value=d.slug||'';
+      document.getElementById('m-desc').value=d.description||'';
+      document.getElementById('m-intro').value=d.intro||'';
+      document.getElementById('m-thanks').value=d.thanks||'';
+      document.getElementById('m-color').value=d.color||'#1e2a52';
+      document.getElementById('m-login').checked=!!d.requireLogin;
+      document.getElementById('m-multi').checked=!!d.allowMultiple;
+      document.getElementById('m-email').checked=!!d.collectEmail;
+      document.getElementById('sv-status-line').innerHTML='<span class="badge '+d.status+'">'+(STL[d.status]||d.status)+'</span>'+(d.reject?' <span style="color:#b91c1c;font-size:12px">سبب الرفض: '+esc(d.reject)+'</span>':'');
+      renderQuestions(d.questions||[]);
+      renderConds(d.questions||[],d.conditions||[]);
+      renderWorkflow(d.status);
+      showEditor();
+    })
+  }
+
+  function renderQuestions(qs){
+    document.getElementById('sv-questions').innerHTML=qs.map(function(q){
+      var opts='';
+      if(CHOICE.indexOf(q.type)>=0){
+        opts='<div class="qopts">'+(q.options||[]).map(function(o){
+          return '<div class="qopt"><input type="text" value="'+esc(o.text)+'" data-opt="'+o.id+'"><button type="button" class="sv-btn mini danger" data-a="delopt" data-id="'+o.id+'">×</button></div>';
+        }).join('')+'<button type="button" class="sv-btn mini ghost" data-a="addopt" data-q="'+q.id+'">+ خيار</button></div>';
+      }
+      var settings='';
+      if(q.type==='scale'||q.type==='rating'){ var s=JSON.parse(q.settings||'{}');
+        settings='<div class="qrow" style="font-size:12.5px"><span>من</span><input type="number" style="width:70px" data-set="min" value="'+(s.min||(q.type==='rating'?1:1))+'"><span>إلى</span><input type="number" style="width:70px" data-set="max" value="'+(s.max||(q.type==='rating'?5:10))+'"></div>';
+      }
+      if(q.type==='grid'){ var g=JSON.parse(q.settings||'{}');
+        settings='<div style="font-size:12.5px"><label>صفوف (سطر لكل صف)<textarea data-set="rows" rows="2">'+((g.rows||[]).join('\n'))+'</textarea></label><label>أعمدة (سطر لكل عمود)<textarea data-set="cols" rows="2">'+((g.cols||[]).join('\n'))+'</textarea></label></div>';
+      }
+      return '<div class="qcard" data-qid="'+q.id+'">'+
+        '<div class="qrow"><span class="qtype">'+(TYPES[q.type]||q.type)+'</span>'+
+        '<input type="text" class="q-text" value="'+esc(q.text)+'" placeholder="نص السؤال">'+
+        '<button type="button" class="sv-btn mini danger" data-a="delq" data-id="'+q.id+'">حذف</button></div>'+
+        '<input type="text" class="q-desc" value="'+esc(q.desc||'')+'" placeholder="وصف/تلميح (اختياري)">'+
+        settings+opts+
+        '<div class="qflags"><label class="sv-chk"><input type="checkbox" class="q-req" '+(q.required?'checked':'')+'> إلزامي</label>'+
+        '<label class="sv-chk"><input type="checkbox" class="q-pub" '+(q.publishStat?'checked':'')+'> نشر إحصائيته</label>'+
+        '<button type="button" class="sv-btn mini" data-a="saveq" data-id="'+q.id+'">حفظ السؤال</button></div></div>';
+    }).join('') || '<p class="sv-note">لا أسئلة بعد — أضف سؤالاً أعلاه.</p>';
+  }
+
+  function renderConds(qs,cs){
+    var opt=qs.map(function(q){return '<option value="'+q.id+'">'+esc(q.text.substring(0,30))+'</option>'}).join('');
+    document.getElementById('c-target').innerHTML=opt;
+    document.getElementById('c-source').innerHTML=opt;
+    var m={}; qs.forEach(function(q){m[q.id]=q.text});
+    document.getElementById('sv-conds').innerHTML=cs.map(function(c){
+      return '<div class="cond"><span>أظهِر «'+esc((m[c.target]||'').substring(0,25))+'» إذا كانت «'+esc((m[c.source]||'').substring(0,25))+'» '+({equals:'=',not_equals:'≠',contains:'تحتوي'}[c.operator]||c.operator)+' "'+esc(c.value)+'"</span><button type="button" class="sv-btn mini danger" data-a="delcond" data-id="'+c.id+'">×</button></div>';
+    }).join('');
+  }
+
+  function renderWorkflow(status){
+    var h='';
+    if(status==='draft'||status==='rejected') h='<button type="button" class="sv-btn gold" data-a="submit_approval">إرسال للاعتماد</button>';
+    else if(status==='pending') h='<span class="sv-note">بانتظار اعتماد المدير</span><button type="button" class="sv-btn green" data-a="approve">اعتماد</button><button type="button" class="sv-btn danger" data-a="reject">رفض</button>';
+    else if(status==='approved') h='<button type="button" class="sv-btn gold" data-a="publish">نشر في المنصة</button>';
+    else if(status==='published') h='<span class="badge published">منشور</span> <button type="button" class="sv-btn ghost" data-a="close">إغلاق</button> <a href="https://youthdata.sa/surveys/'+esc(ST.slug||('survey-'+CUR))+'" target="_blank" class="sv-btn ghost" style="text-decoration:none">فتح في المنصة ↗</a>';
+    document.getElementById('sv-workflow').innerHTML=h;
+  }
+
+  function metaJSON(){
+    return JSON.stringify({title:document.getElementById('m-title').value,description:document.getElementById('m-desc').value,
+      intro:document.getElementById('m-intro').value,thanks:document.getElementById('m-thanks').value,
+      slug:document.getElementById('m-slug').value||null,color:document.getElementById('m-color').value,
+      requireLogin:document.getElementById('m-login').checked?1:0,allowMultiple:document.getElementById('m-multi').checked?1:0,
+      collectEmail:document.getElementById('m-email').checked?1:0});
+  }
+  function qJSON(card){
+    var s={}; card.querySelectorAll('[data-set]').forEach(function(el){
+      var k=el.getAttribute('data-set');
+      if(k==='rows'||k==='cols') s[k]=el.value.split('\n').map(function(x){return x.trim()}).filter(Boolean);
+      else s[k]=Number(el.value);
+    });
+    return JSON.stringify({text:card.querySelector('.q-text').value,desc:card.querySelector('.q-desc').value,
+      required:card.querySelector('.q-req').checked?1:0,publishStat:card.querySelector('.q-pub').checked?1:0,
+      settings:JSON.stringify(s)});
+  }
+
+  function boot(){
+    document.getElementById('sv-admin').addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.tagName==='INPUT')e.preventDefault()});
+    document.getElementById('sv-new').addEventListener('click',function(){var t=prompt('عنوان الاستبيان الجديد:');if(t)p({x01:'create',x03:t}).then(function(r){openSurvey(r.id)})});
+    document.getElementById('sv-back').addEventListener('click',showList);
+    document.getElementById('sv-savemeta').addEventListener('click',function(){p({x01:'savemeta',x02:CUR,p_clob_01:metaJSON()}).then(function(){toast('حُفظت البيانات')})});
+    document.getElementById('sv-addq').addEventListener('click',function(){p({x01:'addq',x02:CUR,x03:document.getElementById('sv-qtype').value}).then(function(){openSurvey(CUR)})});
+    document.getElementById('sv-addcond').addEventListener('click',function(){
+      p({x01:'addcond',x02:CUR,p_clob_01:JSON.stringify({target:Number(document.getElementById('c-target').value),source:Number(document.getElementById('c-source').value),operator:document.getElementById('c-op').value,value:document.getElementById('c-val').value,action:'show'})}).then(function(){openSurvey(CUR)});
+    });
+
+    // قائمة الاستبيانات
+    document.getElementById('sv-list').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var id=b.dataset.id,a=b.dataset.a;
+      if(a==='open') openSurvey(id);
+      else if(a==='del'){if(confirm('حذف الاستبيان وكل بياناته؟'))p({x01:'delsurvey',x02:id}).then(function(){toast('حُذف');loadList()})}
+      else if(a==='approve') p({x01:'approve',x02:id}).then(function(){toast('اعتُمد');loadList()});
+      else if(a==='reject'){var r=prompt('سبب الرفض:');if(r!=null)p({x01:'reject',x02:id,x03:r}).then(function(){loadList()})}
+      else if(a==='publish') p({x01:'publish',x02:id}).then(function(){toast('نُشر');loadList()});
+      else if(a==='home') p({x01:'toggle_home',x02:id}).then(loadList);
+      else if(a==='an') p({x01:'toggle_analytics',x02:id}).then(loadList);
+    });
+
+    // المحرّر (تفويض)
+    document.getElementById('sv-editor').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var a=b.dataset.a;
+      if(a==='delq'){if(confirm('حذف السؤال؟'))p({x01:'delq',x02:b.dataset.id}).then(function(){openSurvey(CUR)})}
+      else if(a==='saveq'){var card=b.closest('.qcard');p({x01:'saveq',x02:b.dataset.id,p_clob_01:qJSON(card)}).then(function(){toast('حُفظ السؤال')})}
+      else if(a==='addopt') p({x01:'addopt',x02:b.dataset.q}).then(function(){openSurvey(CUR)});
+      else if(a==='delopt') p({x01:'delopt',x02:b.dataset.id}).then(function(){openSurvey(CUR)});
+      else if(a==='delcond') p({x01:'delcond',x02:b.dataset.id}).then(function(){openSurvey(CUR)});
+      else if(a==='submit_approval') p({x01:'submit_approval',x02:CUR}).then(function(){toast('أُرسل للاعتماد');openSurvey(CUR)});
+      else if(a==='approve') p({x01:'approve',x02:CUR}).then(function(){toast('اعتُمد');openSurvey(CUR)});
+      else if(a==='reject'){var r=prompt('سبب الرفض:');if(r!=null)p({x01:'reject',x02:CUR,x03:r}).then(function(){openSurvey(CUR)})}
+      else if(a==='publish') p({x01:'publish',x02:CUR}).then(function(){toast('نُشر');openSurvey(CUR)});
+      else if(a==='close') p({x01:'close',x02:CUR}).then(function(){openSurvey(CUR)});
+    });
+    // حفظ نص الخيار عند مغادرته
+    document.getElementById('sv-editor').addEventListener('change',function(e){if(e.target.hasAttribute&&e.target.hasAttribute('data-opt'))p({x01:'saveopt',x02:e.target.getAttribute('data-opt'),x03:e.target.value})});
+
+    loadList();
+  }
+  if(window.apex&&apex.jQuery){apex.jQuery(function(){boot()})}else{document.addEventListener('DOMContentLoaded',boot)}
+})();
+</script>
